@@ -87,6 +87,5 @@ class RiotAPI(object):
         return chmpDict
             
         
-        
     
                 
