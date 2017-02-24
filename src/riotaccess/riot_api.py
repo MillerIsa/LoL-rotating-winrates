@@ -3,18 +3,32 @@ Created on Feb 17, 2017
 
 @author: Brian-VAIO
 '''
+#from ratelimit import rate_limited
 import requests
 import consts
 from riotaccess.consts import API_VERSIONS
+#import ratelimit
 
 class RiotAPI(object):
+    #count of requests left in 10 seconds, count of requests left in 600 seconds,time that first request in the time window was sent for each
+    class PrevReq:
+        def __init__(self):
+            #self.secLim={'countLeft':10,'timeSent':}
+            #self.minLim{'countLeft':600,'timeSent':}        
 
     def __init__(self, api_key, region=consts.REGIONS['north_america']):
         self.api_key = api_key
         self.region = region
+        
+        self.secLim={'countLeft':10,'timeSent':0}
+        self.minLim{'countLeft':600,'timeSent':0}  
+        
         #base request method, assumes dynamic request unless specified
         #@return: dictionary object
+    #rate limits are applied properly when request method is called through tenMinLimit()
+    #@rate_limited(500,600)
     def _request(self, api_url,is_static=False, params={}):
+                
         args = {'api_key':self.api_key}
         for key, value in params.items():
             if key not in args:
@@ -85,7 +99,12 @@ class RiotAPI(object):
         for name in tempDict['data']:
             chmpDict[tempDict['data'][name]['id']]=name
         return chmpDict
+    
+    #@rate_limited(500, 600)
+    #def tenSecLim(self):
+     #   return True
             
         
+
     
                 
