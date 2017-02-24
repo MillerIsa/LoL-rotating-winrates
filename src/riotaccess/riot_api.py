@@ -6,48 +6,93 @@ Created on Feb 17, 2017
 #from ratelimit import rate_limited
 import requests
 import consts
+import time
 from riotaccess.consts import API_VERSIONS
 #import ratelimit
 
 class RiotAPI(object):
     #count of requests left in 10 seconds, count of requests left in 600 seconds,time that first request in the time window was sent for each
-    class PrevReq:
-        def __init__(self):
+    #class PrevReq:
+        #def __init__(self):
             #self.secLim={'countLeft':10,'timeSent':}
             #self.minLim{'countLeft':600,'timeSent':}        
 
     def __init__(self, api_key, region=consts.REGIONS['north_america']):
         self.api_key = api_key
         self.region = region
-        
-        self.secLim={'countLeft':10,'timeSent':0}
-        self.minLim{'countLeft':600,'timeSent':0}  
+        initialTime=time.process_time()
+        #'timeSent' represents the time that the first request within the given time window was made
+        self.secLim={'countLeft':10,'timeSent':initialTime}
+        self.minLim={'countLeft':500,'timeSent':initialTime}  
         
         #base request method, assumes dynamic request unless specified
         #@return: dictionary object
     #rate limits are applied properly when request method is called through tenMinLimit()
     #@rate_limited(500,600)
     def _request(self, api_url,is_static=False, params={}):
-                
-        args = {'api_key':self.api_key}
-        for key, value in params.items():
-            if key not in args:
-                args[key] = value
-        if is_static:
-            base=consts.URL['static_base']
+        #check to see if request is allowed by the rate limit
+        if time.process_time() - self.minLim['timeSent'] > 600:
+            self.minLim['countLeft']=500
+        if time.process_time() - self.secLim['timeSent'] > 10:
+            self.secLim['countLeft']=10
+        if self.minLim['countLeft'] > 0 and self.secLim['countLeft'] > 0:        
+            args = {'api_key':self.api_key}
+            for key, value in params.items():
+                if key not in args:
+                    args[key] = value
+            if is_static:
+                base=consts.URL['static_base']
+            else:
+                base=consts.URL['base']
+            response = requests.get(           
+                base.format (
+                    proxy=self.region,
+                    region=self.region,
+                    url=api_url
+                    ),
+                params=args
+                )
+            #record request info for rate limit management 
+            newTime=time.process_time()
+            print(response.headers['X-Rate-Limit-Count'])
+            print(type(response.headers['X-Rate-Limit-Count']))
+            #unpacks 'X-Rate-Limit-Count' response header
+            x=0
+            secCount=''
+            minCount=''
+            header=response.headers['X-Rate-Limit-Count']
+            while (x < len(header)):
+                if header[x] == ':':
+                    while (header[x] != ','):
+                        x+=1
+                    x+=1
+                    print(x)
+                    while (header[x] != ':'):
+                        minCount+=header[x]
+                        x+=1
+                    secCount = int(secCount)
+                    minCount = int(minCount)
+                    break
+                secCount+=header[x]
+                x+=1
+            #print('secCount is:',secCount,'minCount is:',minCount)
+            self.minLim['countLeft']=500 - minCount
+            self.secLim['countLeft']=10 - secCount
+            #reset time if this is the first request in a time window
+            if self.minLim['countLeft'] == 499:
+                self.minLim['timeSent']=newTime
+            if self.secLim['countLeft'] == 9:
+                self.secLim['timeSent']=newTime
+            print (response.url)
+            return response.json()
         else:
-            base=consts.URL['base']
-        response = requests.get(           
-            base.format (
-                proxy=self.region,
-                region=self.region,
-                url=api_url
-                ),
-            params=args
-            )
-        print (response.url)
-        return response.json()
+            if self.secLim['countLeft'] == 0:
+                time.sleep(10 - (time.process_time() - self.secLim['timeSent']))
+            if self.minLim['countLeft'] == 0:
+                time.sleep(10 - (time.process_time() - self.minLim['timeSent']))
+        return None
     
+ 
     
     #does NOT count against rate limit
     #@return dictionary of champion info 
@@ -102,7 +147,7 @@ class RiotAPI(object):
     
     #@rate_limited(500, 600)
     #def tenSecLim(self):
-     #   return True
+    #   return True
             
         
 
