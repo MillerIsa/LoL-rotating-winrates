@@ -80,6 +80,11 @@ class WinCollector:
         
         #pulls the win/loss data for an individual's game history
         summsToPull=self.examineGameHistory(rootPlayer,gameMode)
+        print('summs to spider over',summsToPull)
+        x=0
+        for summ in summsToPull:
+            x+=1
+        print('summsFound:',x)
         for summId in summsToPull:
             self.spider(summId,gameMode)
         
@@ -91,9 +96,11 @@ class WinCollector:
     def addId(self,newId,listKey):
         x=0
         while (x < len(self.lists[listKey]) and newId >= self.lists[listKey][x]):   
-            if self.lists[listKey] == newId:
+            if self.lists[listKey][x] == newId:
+                print('!!id in list!!')
                 return False            
             x+=1
+        print('%%%%%id not in list{[[[[[',self.lists[listKey])
         self.lists[listKey].insert(x, newId)
         return True
     
