@@ -25,25 +25,17 @@ class RiotAPI(object):
         self.secLim={'countLeft':10,'timeSent':initialTime}
         self.minLim={'countLeft':500,'timeSent':initialTime}  
         
-        #base request method, assumes dynamic request unless specified
-        #@return: dictionary object
+    #base request method, assumes dynamic request unless specified
+    #@return: dictionary object OR an integer representing the http response code in case of response failure
     #rate limits are applied properly when request method is called through tenMinLimit()
-    #@rate_limited(500,600)
+    #check http response code before attempting to use response data
     def _request(self, api_url,is_static=False, params={}):
-        #check to see if request is allowed by the rate limit
-        if time.process_time() - self.minLim['timeSent'] > 600:
-            self.minLim['countLeft']=500
-        if time.process_time() - self.secLim['timeSent'] > 10:
-            self.secLim['countLeft']=10
-        if self.minLim['countLeft'] > 0 and self.secLim['countLeft'] > 0:        
+        if is_static:
             args = {'api_key':self.api_key}
             for key, value in params.items():
                 if key not in args:
                     args[key] = value
-            if is_static:
-                base=consts.URL['static_base']
-            else:
-                base=consts.URL['base']
+            base=consts.URL['static_base']
             response = requests.get(           
                 base.format (
                     proxy=self.region,
@@ -52,45 +44,88 @@ class RiotAPI(object):
                     ),
                 params=args
                 )
-            #record request info for rate limit management 
-            newTime=time.process_time()
-            print(response.headers['X-Rate-Limit-Count'])
-            print(type(response.headers['X-Rate-Limit-Count']))
-            #unpacks 'X-Rate-Limit-Count' response header
-            x=0
-            secCount=''
-            minCount=''
-            header=response.headers['X-Rate-Limit-Count']
-            while (x < len(header)):
-                if header[x] == ':':
-                    while (header[x] != ','):
+            if response.status_code == 200:return response.json()
+            return response.status_code
+                
+                      
+            
+        #check to see if request is allowed by the rate limit      
+        if time.process_time() - self.minLim['timeSent'] > 600:
+            self.minLim['countLeft']=500
+        print(time.process_time() - self.secLim['timeSent'])
+        if time.process_time() - self.secLim['timeSent'] > 10:
+            self.secLim['countLeft']=10
+        if self.minLim['countLeft'] > 0 and self.secLim['countLeft'] > 0:        
+            args = {'api_key':self.api_key}
+            for key, value in params.items():
+                if key not in args:
+                    args[key] = value  
+            base=consts.URL['base']
+            response = requests.get(           
+                base.format (
+                    proxy=self.region,
+                    region=self.region,
+                    url=api_url
+                    ),
+                params=args
+                )
+            if response.status_code == 200 or response.status_code == 429:
+                #record request info for rate limit management 
+                newTime=time.process_time()
+                print(response.headers)
+                print(response.headers['X-Rate-Limit-Count'])
+                print(type(response.headers['X-Rate-Limit-Count']))
+                #unpacks 'X-Rate-Limit-Count' response header
+                x=0
+                secCount=''
+                minCount=''
+                header=response.headers['X-Rate-Limit-Count']
+                while (x < len(header)):
+                    if header[x] == ':':
+                        while (header[x] != ','):
+                            x+=1
                         x+=1
+                        print(x)
+                        while (header[x] != ':'):
+                            minCount+=header[x]
+                            x+=1
+                        secCount = int(secCount)
+                        minCount = int(minCount)
+                        break
+                    secCount+=header[x]
                     x+=1
-                    print(x)
-                    while (header[x] != ':'):
-                        minCount+=header[x]
-                        x+=1
-                    secCount = int(secCount)
-                    minCount = int(minCount)
-                    break
-                secCount+=header[x]
-                x+=1
-            #print('secCount is:',secCount,'minCount is:',minCount)
-            self.minLim['countLeft']=500 - minCount
-            self.secLim['countLeft']=10 - secCount
-            #reset time if this is the first request in a time window
-            if self.minLim['countLeft'] == 499:
-                self.minLim['timeSent']=newTime
-            if self.secLim['countLeft'] == 9:
-                self.secLim['timeSent']=newTime
+                #print('secCount is:',secCount,'minCount is:',minCount)
+                self.minLim['countLeft']=500 - minCount
+                self.secLim['countLeft']=10 - secCount
+                #reset time if this is the first request in a time window
+                if self.minLim['countLeft'] == 499:
+                    self.minLim['timeSent']=newTime
+                if self.secLim['countLeft'] == 9:
+                    self.secLim['timeSent']=newTime
             print (response.url)
-            return response.json()
+            if response.status_code == 429:
+                if 'X-Rate-Limit-Type' in response.headers:
+                    print(response.headers['X-Rate-Limit-Type'])
+                    time.sleep(response.headers['Retry-After'])
+                else:print('Rate limit was enforced by the underlying service to which the request was proxied.')
+                return response.status_code
+            print(response.status_code)
+            if response.status_code == 200: return response.json()
         else:
             if self.secLim['countLeft'] == 0:
-                time.sleep(10 - (time.process_time() - self.secLim['timeSent']))
+                retryAfter=10 - (time.process_time() - self.secLim['timeSent'])
+                if retryAfter < 0.1:retryAfter=0.1
+                print('retryAfter:',retryAfter)
+                self.secLim['timeSent']-=retryAfter
+                time.sleep(retryAfter)
+                self._request(api_url, is_static)
             if self.minLim['countLeft'] == 0:
-                time.sleep(10 - (time.process_time() - self.minLim['timeSent']))
-        return None
+                retryAfter=600 - (time.process_time() - self.minLim['timeSent'])
+                if retryAfter < 0.1:retryAfter=0.1
+                self.minLim['timeSent']-=retryAfter
+                time.sleep(retryAfter)
+                self._request(api_url, is_static)
+        return 0
     
  
     

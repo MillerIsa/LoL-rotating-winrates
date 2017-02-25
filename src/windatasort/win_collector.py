@@ -5,6 +5,7 @@ Created on Feb 20, 2017
 '''
 from riotaccess.riot_api import RiotAPI 
 import consts
+from builtins import int
 class WinCollector:
     'uses riot_api instance object to initialize the winDict with correct champion Ids and names. Also initializes the game statistics to zero.'
     #needs a RiotAPI object to perform data collection
@@ -21,51 +22,54 @@ class WinCollector:
     #returns a list of summIds        
     def examineGameHistory(self,keyPlayerId,mode):
         keyPlayerId=keyPlayerId
-        history=self.api.get_game_history(keyPlayerId)
         summIdList=[]
-        try:
-            games=history['games']
-        except KeyError:
-            print('No such key. Available keys are',history.keys())
-        for game in games:
-            #executes suite only if the game is of the correct mode and not already counted
-            if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId(game['gameId'],'games'):             
-            #records win stats of the key player
-                chmpId=game['championId']
-                chmpEntry=self.winDict[chmpId]
-                print (game)#testing purposes
-                if game['stats']['win'] == True:
-                    chmpEntry['wins']+=1
-                else:
-                    chmpEntry['losses']+=1
-                chmpEntry['totalGames']+=1
-            
-            #dictionary to test for mirror matches
-                mirrorDict={}
-                mirrorDict[chmpId]=1
-            
-                keyTeamId=game['teamId']     
-                for player in game['fellowPlayers']:
-                    #log Ids of the players if not in the master list already
-                    if self.addId(player['summonerId'],'summoners'):
-                        summIdList.append(player['summonerId'])
-                    #logs win/losses of champions
-                    chmpId=player['championId']
+        history=self.api.get_game_history(keyPlayerId)
+        if type(history) == dict:
+            try:
+                games=history['games']
+            except KeyError:
+                print('No such key. Available keys are',history.keys())
+                return summIdList
+            for game in games:
+                #executes suite only if the game is of the correct mode and not already counted
+                if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId(game['gameId'],'games'):             
+                #records win stats of the key player
+                    chmpId=game['championId']
                     chmpEntry=self.winDict[chmpId]
-                    myTeamId=player['teamId']
-                    if (myTeamId == keyTeamId) == (game['stats']['win']):
+                    print (game)#testing purposes
+                    if game['stats']['win'] == True:
                         chmpEntry['wins']+=1
                     else:
                         chmpEntry['losses']+=1
                     chmpEntry['totalGames']+=1
-                #incrementing to find mirror match ups
-                    try:
-                        mirrorDict[chmpId]+=1
-                    except KeyError:
-                        mirrorDict[chmpId]=1   
-                for chmpId in mirrorDict:
-                    if mirrorDict[chmpId] % 2 == 0:
-                        self.winDict[chmpId]['mirrorMatches']+=1
+                
+                #dictionary to test for mirror matches
+                    mirrorDict={}
+                    mirrorDict[chmpId]=1
+                
+                    keyTeamId=game['teamId']     
+                    for player in game['fellowPlayers']:
+                        #log Ids of the players if not in the master list already
+                        if self.addId(player['summonerId'],'summoners'):
+                            summIdList.append(player['summonerId'])
+                        #logs win/losses of champions
+                        chmpId=player['championId']
+                        chmpEntry=self.winDict[chmpId]
+                        myTeamId=player['teamId']
+                        if (myTeamId == keyTeamId) == (game['stats']['win']):
+                            chmpEntry['wins']+=1
+                        else:
+                            chmpEntry['losses']+=1
+                        chmpEntry['totalGames']+=1
+                    #incrementing to find mirror match ups
+                        try:
+                            mirrorDict[chmpId]+=1
+                        except KeyError:
+                            mirrorDict[chmpId]=1   
+                    for chmpId in mirrorDict:
+                        if mirrorDict[chmpId] % 2 == 0:
+                            self.winDict[chmpId]['mirrorMatches']+=1
+        else: print(history)
         return summIdList
             
     #@param rootPlayer is the summoner id of the player to start spidering from
