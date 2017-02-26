@@ -9,13 +9,15 @@ import consts
 from windatasort.win_collector import WinCollector
 def main():
     api=initialize()   
-    #r=api.get_summoner_by_id(62601084,49330575,20378336) 
+    #r=api.get_summoner_by_id(62601084,49330575,20378336)
+    #print (r) 
     winning=WinCollector(api)
-    winning.spider(60683268, consts.GAME_MODES['poro_king'])
+    winning.spider(81061413, consts.GAME_MODES['urf'])
+    
     #winning.examineGameHistory(60683268,consts.GAME_MODES['poro_king'])
     print (winning.winDict)
     print('lists are:',winning.lists)
-    print (r)
+    
     print('Total games collected:',winning.getGamesCollected())
     print('GameIds',winning.lists['games'])
 

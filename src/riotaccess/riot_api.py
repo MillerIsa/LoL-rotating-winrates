@@ -52,7 +52,7 @@ class RiotAPI(object):
         #check to see if request is allowed by the rate limit      
         if time.process_time() - self.minLim['timeSent'] > 600:
             self.minLim['countLeft']=500
-        print(time.process_time() - self.secLim['timeSent'])
+        #print(time.process_time() - self.secLim['timeSent'])
         if time.process_time() - self.secLim['timeSent'] > 10:
             self.secLim['countLeft']=10
         if self.minLim['countLeft'] > 0 and self.secLim['countLeft'] > 0:        
@@ -72,9 +72,6 @@ class RiotAPI(object):
             if response.status_code == 200 or response.status_code == 429:
                 #record request info for rate limit management 
                 newTime=time.process_time()
-                print(response.headers)
-                print(response.headers['X-Rate-Limit-Count'])
-                print(type(response.headers['X-Rate-Limit-Count']))
                 #unpacks 'X-Rate-Limit-Count' response header
                 x=0
                 secCount=''
@@ -85,7 +82,6 @@ class RiotAPI(object):
                         while (header[x] != ','):
                             x+=1
                         x+=1
-                        print(x)
                         while (header[x] != ':'):
                             minCount+=header[x]
                             x+=1
@@ -102,14 +98,12 @@ class RiotAPI(object):
                     self.minLim['timeSent']=newTime
                 if self.secLim['countLeft'] == 9:
                     self.secLim['timeSent']=newTime
-            print (response.url)
             if response.status_code == 429:
                 if 'X-Rate-Limit-Type' in response.headers:
                     print(response.headers['X-Rate-Limit-Type'])
                     time.sleep(response.headers['Retry-After'])
                 else:print('Rate limit was enforced by the underlying service to which the request was proxied.')
                 return response.status_code
-            print(response.status_code)
             if response.status_code == 200: return response.json()
         else:
             if self.secLim['countLeft'] == 0:
