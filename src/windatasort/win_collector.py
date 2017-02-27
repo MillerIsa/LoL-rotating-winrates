@@ -28,6 +28,7 @@ class WinCollector:
     def examineGameHistory(self,keyPlayerId,mode):
         keyPlayerId=keyPlayerId
         summIdList=[]
+        print('player to retrieve history on:',keyPlayerId)
         history=self.api.get_game_history(keyPlayerId)
         if type(history) == dict:
             try:
@@ -74,7 +75,7 @@ class WinCollector:
                     for chmpId in mirrorDict:
                         if mirrorDict[chmpId] % 2 == 0:
                             self.winDict['champions'][chmpId]['mirrorMatches']+=1
-        else: print(history)
+        else: print('history is:',history)
         return summIdList
             
     #@param rootPlayer is the summoner id of the player to start spidering from
@@ -82,22 +83,31 @@ class WinCollector:
     #!!!!!!!IMPLIMENT RATE LIMITITNG BEFORE RUNNIG PROGRAM AGAIN. This method will exceed rate limit every time otherwise!!!!!!     
     def spider(self,rootPlayer,gameMode):
         'pulls game data for statistical analysis and stores the portions of the data in winDict' 
-        #preforms statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-        if len(self.lists['games']) - self.statedGames > 100:
-            print('games collected:',self.winDict)
-            print('stats are:')
-            self.stater.calcAll()
-            print(self.stater.statDict)
-            self.statedGames=len(self.lists['games'])
+      
+        summsToPull=[rootPlayer]
         #pulls the win/loss data for an individual's game history
-        summsToPull=self.examineGameHistory(rootPlayer,gameMode)
-        print('summs to spider over',summsToPull)
+        for summ in self.examineGameHistory(rootPlayer,gameMode):
+            summsToPull.append(summ)
         x=0
         for summ in summsToPull:
             x+=1
+            print('summ in list:',summ)
         print('summsFound:',x)
-        for summId in summsToPull:
-            self.spider(summId,gameMode)
+        i=0
+        while (i < len(summsToPull)):
+            summ=summsToPull[i]
+            summsToPull.append(self.examineGameHistory(summ,gameMode))
+            i+=1
+            #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
+            if len(self.lists['games']) - self.statedGames > 100:
+                print('total games collected:',self.winDict['totalGames'])
+                print('stats are:')
+                self.stater.calcAll()
+                self.stater.printCalcs()
+                self.statedGames=len(self.lists['games'])
+        #for summId in summsToPull:
+            #self.spider(summId,gameMode)
+            
         
     #@param mode is a GameMode object used to filter examined games down to the desired game mode using mode type and subtype (not yet implimented)
     
@@ -118,7 +128,7 @@ class WinCollector:
     def getGamesCollected(self):
         collectedGames=0
         for chmpEntry in self.winDic['champions']:
-            print(self.winDict['champions'][chmpEntry])
+            print('do not call getGamesCollected()',self.winDict['champions'][chmpEntry])
             collectedGames+=self.winDict['champions'][chmpEntry]['totalGames']
         return collectedGames #/ 10
             

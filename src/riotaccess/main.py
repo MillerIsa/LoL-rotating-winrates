@@ -13,6 +13,8 @@ def main():
     #print (r) 
     winning=WinCollector(api)
     winning.spider(81061413, consts.GAME_MODES['urf'])
+    winning.stater.calcAll()
+    winning.stater.printCalcs()
     
     #winning.examineGameHistory(60683268,consts.GAME_MODES['poro_king'])
     print (winning.winDict)

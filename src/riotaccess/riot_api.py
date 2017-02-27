@@ -101,7 +101,8 @@ class RiotAPI(object):
             if response.status_code == 429:
                 if 'X-Rate-Limit-Type' in response.headers:
                     print(response.headers['X-Rate-Limit-Type'])
-                    time.sleep(response.headers['Retry-After'])
+                    print('rate limit exceeded, retry after:',response.headers['Retry-After'])
+                    time.sleep(int(response.headers['Retry-After']))
                 else:print('Rate limit was enforced by the underlying service to which the request was proxied.')
                 return response.status_code
             if response.status_code == 200: return response.json()
