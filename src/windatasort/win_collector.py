@@ -7,6 +7,8 @@ from riotaccess.riot_api import RiotAPI
 import consts
 from builtins import int
 from windatasort import stat_calc
+import time
+
 class WinCollector:
     'uses riot_api instance object to initialize the winDict with correct champion Ids and names. Also initializes the game statistics to zero.'
     #needs a RiotAPI object to perform data collection
@@ -96,10 +98,17 @@ class WinCollector:
         i=0
         while (i < len(summsToPull)):
             summ=summsToPull[i]
-            summsToPull.append(self.examineGameHistory(summ,gameMode))
+            newSumms=self.examineGameHistory(summ,gameMode)
             i+=1
+            s=0
+            while (s < len(newSumms)):
+                summsToPull.append(newSumms[s])
+                s+=1
+                #prevent method from nomming all cpu during testing phaseS
+                time.sleep(.001)
+                #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 100:
+            if len(self.lists['games']) - self.statedGames > 1000:
                 print('total games collected:',self.winDict['totalGames'])
                 print('stats are:')
                 self.stater.calcAll()
@@ -124,6 +133,40 @@ class WinCollector:
         #print('%%%%%id not in list{[[[[[',self.lists[listKey])
         self.lists[listKey].insert(x, newId)
         return True
+    #add an entry to the list if it is not already in there. Split the list in half until the correct index is located
+    def addId2(self,newId,listKey):
+        reList=self.lists[listKey]
+        testInd=len(reList) / 2 
+        if reList[testInd - 1] < newId < reList[testInd]:
+            reList.insert(testInd,newId)
+            return True
+        if reList[testInd] == newId:
+            return False
+        leftInd=-1
+        rightInd=len(reList)
+        #never test the right or left indexes. They are guaranteed to not be the target value
+        #while sublist length is at least 2
+        while(rightInd - leftInd > 2):
+            testInd=(rightInd + leftInd + 1) / 2
+            if reList[testInd - 1] < newId < reList[testInd]:
+                reList.insert(testInd,newId)
+                return True
+            if reList[testInd] == newId:
+                return False
+            if newId < reList[testInd]:
+                rightInd=testInd# - 1
+            else:
+                leftInd=testInd# + 1
+        x=leftInd + 1
+        while (x < rightInd and newId >= reList[x]):
+            if reList[x] == newId:
+                return False
+            x+=1
+        reList.insert(x,newId)
+        return True
+            
+            
+            
     #deprecated - use self.totalGames instead
     def getGamesCollected(self):
         collectedGames=0
