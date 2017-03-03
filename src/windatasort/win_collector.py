@@ -8,6 +8,7 @@ import consts
 from builtins import int
 from windatasort import stat_calc
 import time
+import copy
 
 class WinCollector:
     'uses riot_api instance object to initialize the winDict with correct champion Ids and names. Also initializes the game statistics to zero.'
@@ -24,7 +25,16 @@ class WinCollector:
         self.winDict['champions']={}
         for chmpId in chmpNames:  
             chmpName=chmpNames[chmpId]
-            self.winDict['champions'][chmpId]={'chmpName':chmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0}
+            #the win rate of a particular pair is equal to the sum of the two pair entries. Ex: win rate of ahri,annie + annie,ahri = win rate of the annie ahri pairing
+            #entries where chmpId and subChmpId are the same will have double the values
+            self.winDict['champions'][chmpId]={'chmpName':chmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0,'partners':{},'opponents':{}}
+        self.pairDict={}
+        for chmpId in self.winDict['champions']:
+            for subChmpId in self.winDict['champions']:
+                subChmpName=chmpNames[subChmpId]
+                #mirror matches are not yet implemented for pairings
+                self.winDict['champions'][chmpId]['partners'][subChmpId]={'partnerName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0}
+                self.winDict['champions'][chmpId]['opponents'][subChmpId]={'opponentName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0}
         self.stater=stat_calc.StatCalc(self)
     #returns a list of summIds        
     def examineGameHistory(self,keyPlayerId,mode):
@@ -40,25 +50,48 @@ class WinCollector:
                 return summIdList
             for game in games:
                 #executes suite only if the game is of the correct mode and not already counted
-                if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId(game['gameId'],'games'): 
+                if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'],'games'): 
+                    keyTeamId=game['teamId'] 
                     self.winDict['totalGames']+=1            
                     #records win stats of the key player
-                    chmpId=game['championId']
-                    chmpEntry=self.winDict['champions'][chmpId]
+                    mChmpId=game['championId']
+                    chmpEntry=self.winDict['champions'][mChmpId]
                     if game['stats']['win'] == True:
                         chmpEntry['wins']+=1
                     else:
                         chmpEntry['losses']+=1
                     chmpEntry['totalGames']+=1
-                
+                    #records pairing data. logs data with the higher Id on the encapsulating level
+                    #game represents the key champion in the list of partners
+                    partners=copy.copy(game['fellowPlayers'])
+                    partners.append(game)
+                    print('champions in game:',partners)
+                    self.partner(partners, game)
+                    #for player in game['fellowPlayers']:
+                    #        for pairPlayer in game['fellowPlayers']:
+                    #            pairId=pairPlayer['championId']
+                    #            if mChmpId >= pairId:
+                    #                if (player['teamId'] == keyTeamId):
+                    #                    if game['stats']['win']:
+                    #                        self.winDict['champions'][mChmpId]['partners'][pairId]['wins']+=1
+                    #                    else:
+                    #                        self.winDict['champions'][mChmpId]['partners'][pairId]['losses']+=1
+                    #                    self.winDict['champions'][mChmpId]['partners'][pairId]['totalGames']+=1
+                    #                else:
+                    #                    if game['stats']['win']:
+                    #                        self.winDict['champions'][mChmpId]['opponents'][pairId]['losses']+=1
+                    #                    else:
+                    #                        self.winDict['champions'][mChmpId]['opponents'][pairId]['wins']+=1
+                    #                    self.winDict['champions'][mChmpId]['opponents'][pairId]['totalGames']+=1
+                    
                 #dictionary to test for mirror matches
                     mirrorDict={}
-                    mirrorDict[chmpId]=1
+                    mirrorDict[mChmpId]=1
                 
-                    keyTeamId=game['teamId']     
+                        
                     for player in game['fellowPlayers']:
                         #log Ids of the players if not in the master list already
-                        if self.addId(player['summonerId'],'summoners'):
+                        if self.addId2(player['summonerId'],'summoners'):
                             summIdList.append(player['summonerId'])
                         #logs win/losses of champions
                         chmpId=player['championId']
@@ -74,12 +107,66 @@ class WinCollector:
                             mirrorDict[chmpId]+=1
                         except KeyError:
                             mirrorDict[chmpId]=1   
+                        #logs chmp pairing data
+                        
+                        
+                        #for pairPlayer in game['fellowPlayers']:
+                        #    pairId=pairPlayer['championId']
+                        #    
+                        #    if chmpId >= pairId:
+                        #            if (player['teamId'] == keyTeamId):
+                        #                if game['stats']['win']:
+                        #                    self.winDict['champions'][chmpId]['partners'][pairId]['wins']+=1
+                        #                else:
+                        #                    self.winDict['champions'][chmpId]['partners'][pairId]['losses']+=1
+                        #                self.winDict['champions'][chmpId]['partners'][pairId]['totalGames']+=1
+                        #            else:
+                        #                if game['stats']['win']:
+                        #                    self.winDict['champions'][chmpId]['opponents'][pairId]['losses']+=1
+                        #                else:
+                        #                    self.winDict['champions'][chmpId]['opponents'][pairId]['wins']+=1
+                        #                self.winDict['champions'][chmpId]['opponents'][pairId]['totalGames']+=1
+                        #if chmpId >= mChmpId:
+                        #    if (player['teamId'] == keyTeamId):
+                        #        if game['stats']['win']:
+                        #            self.winDict['champions'][chmpId]['partners'][mChmpId]['wins']+=1
+                        #        else:
+                        #            self.winDict['champions'][chmpId]['partners'][mChmpId]['losses']+=1
+                        #        self.winDict['champions'][chmpId]['partners'][mChmpId]['totalGames']+=1
+                        #    else:
+                        #        if game['stats']['win']:
+                        #            self.winDict['champions'][chmpId]['opponents'][mChmpId]['losses']+=1
+                        #        else:
+                        #            self.winDict['champions'][chmpId]['opponents'][mChmpId]['wins']+=1
+                        #        self.winDict['champions'][chmpId]['opponents'][mChmpId]['totalGames']+=1
+                            
                     for chmpId in mirrorDict:
                         if mirrorDict[chmpId] % 2 == 0:
                             self.winDict['champions'][chmpId]['mirrorMatches']+=1
-        else: print('history is:',history)
+        else: 
+            print('history is:',history)
         return summIdList
-            
+    #logs all pair win/losses in the given list of partners for the game given
+    #@ param "partners" each partner must be a dictionary with the following keys: 'teamId','championId'
+    def partner(self,partners,game):
+        keyTeamId=game['teamId']
+        for player in partners:
+            myTeamId=player['teamId']
+            chmpId=player['championId']
+            for pairPlayer in partners:
+                pairId=pairPlayer['championId']
+                if chmpId >= pairId:
+                    allyOrNot=self.winDict['champions'][chmpId]['opponents'][pairId]
+                    #if true, then they are on the same team
+                    if (pairPlayer['teamId'] == myTeamId):
+                        allyOrNot=self.winDict['champions'][chmpId]['partners'][pairId]
+                    if (pairPlayer['teamId'] == keyTeamId) == game['stats']['win']:
+                        allyOrNot['wins']+=1
+                    else:
+                        allyOrNot['losses']+=1
+                    allyOrNot['totalGames']+=1    
+                    
+                                
     #@param rootPlayer is the summoner id of the player to start spidering from
     #@param string representing game mode 
     #!!!!!!!IMPLIMENT RATE LIMITITNG BEFORE RUNNIG PROGRAM AGAIN. This method will exceed rate limit every time otherwise!!!!!!     
@@ -108,7 +195,7 @@ class WinCollector:
                 time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 1000:
+            if len(self.lists['games']) - self.statedGames > 100:
                 print('total games collected:',self.winDict['totalGames'])
                 print('stats are:')
                 self.stater.calcAll()
@@ -136,22 +223,30 @@ class WinCollector:
     #add an entry to the list if it is not already in there. Split the list in half until the correct index is located
     def addId2(self,newId,listKey):
         reList=self.lists[listKey]
-        testInd=len(reList) / 2 
-        if reList[testInd - 1] < newId < reList[testInd]:
-            reList.insert(testInd,newId)
-            return True
-        if reList[testInd] == newId:
-            return False
+        #testInd=len(reList) // 2 
+        #print('test index is:',testInd)
+        #if reList[testInd - 1] < newId < reList[testInd]:
+        #    reList.insert(testInd,newId)
+        #    return True
+        #if reList[testInd] == newId:
+        #    return False
         leftInd=-1
         rightInd=len(reList)
         #never test the right or left indexes. They are guaranteed to not be the target value
         #while sublist length is at least 2
+        y=0
         while(rightInd - leftInd > 2):
-            testInd=(rightInd + leftInd + 1) / 2
+            y+=1
+            testInd=(rightInd + leftInd + 1) // 2 
+            #print('test index is:',testInd)
             if reList[testInd - 1] < newId < reList[testInd]:
                 reList.insert(testInd,newId)
+                print('number of index checks:',y)
+                print('for list length of:',len(reList))
                 return True
             if reList[testInd] == newId:
+                print('number of index checks:',y)
+                print('for list length of:',len(reList))
                 return False
             if newId < reList[testInd]:
                 rightInd=testInd# - 1
@@ -159,7 +254,10 @@ class WinCollector:
                 leftInd=testInd# + 1
         x=leftInd + 1
         while (x < rightInd and newId >= reList[x]):
+            y+=1
             if reList[x] == newId:
+                print('number of index checks:',y)
+                print('for list length of:',len(reList))
                 return False
             x+=1
         reList.insert(x,newId)

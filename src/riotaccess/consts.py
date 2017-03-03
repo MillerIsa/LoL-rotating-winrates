@@ -35,11 +35,14 @@ class GameMode:
         self.subType=subType
 
 GAME_MODES = {
+    'aram':GameMode('ARAM','ARAM_UNRANKED_5x5'),
+    'ranked5v5':GameMode('CLASSIC','RANKED_SOLO_5x5'),
+    'normals':GameMode('CLASSIC','NORMAL'),
     'ascension':GameMode('ASCENSION','ASCENSION'),
     'one_for_all':GameMode('ONEFORALL','ONEFORALL_5x5'),
     'poro_king':GameMode('KINGPORO','KING_PORO'),
     'blood_moon':GameMode('ASSASSINATE','ASSASSINATE'),
-    'urf':GameMode('URF','URF'),#The first parameter 'CLASSIC' is likely incorrect for urf
+    'urf':GameMode('URF','URF'),
     'nexus_seige':GameMode('SEIGE','SEIGE'),
     'definitely_not_dominion':GameMode('ODIN','ODIN_UNRANKED'),
     'snowdown_showdown':GameMode('FIRSTBLOOD','FIRSTBLOOD_1x1')    

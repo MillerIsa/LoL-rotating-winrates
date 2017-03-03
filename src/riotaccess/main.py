@@ -12,7 +12,7 @@ def main():
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
     #print (r) 
     winning=WinCollector(api)
-    winning.spider(81061413, consts.GAME_MODES['urf'])
+    winning.spider(59892834, consts.GAME_MODES['aram'])
     winning.stater.calcAll()
     winning.stater.printCalcs()
     

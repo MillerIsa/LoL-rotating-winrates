@@ -103,6 +103,7 @@ class RiotAPI(object):
                     print(response.headers['X-Rate-Limit-Type'])
                     print('rate limit exceeded, retry after:',response.headers['Retry-After'])
                     time.sleep(int(response.headers['Retry-After']))
+                    return self._request(api_url, is_static)
                 else:print('Rate limit was enforced by the underlying service to which the request was proxied.')
                 return response.status_code
             if response.status_code == 200: return response.json()
@@ -113,13 +114,13 @@ class RiotAPI(object):
                 print('retryAfter:',retryAfter)
                 self.secLim['timeSent']-=retryAfter
                 time.sleep(retryAfter)
-                self._request(api_url, is_static)
+                return self._request(api_url, is_static)
             if self.minLim['countLeft'] == 0:
                 retryAfter=600 - (time.process_time() - self.minLim['timeSent'])
                 if retryAfter < 0.1:retryAfter=0.1
                 self.minLim['timeSent']-=retryAfter
                 time.sleep(retryAfter)
-                self._request(api_url, is_static)
+                return self._request(api_url, is_static)
         return 0
     
  
