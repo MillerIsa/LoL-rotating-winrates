@@ -7,6 +7,8 @@ from riotaccess.riot_api import RiotAPI
 import consts
 from builtins import int
 from windatasort import stat_calc
+from windatasort import sheets
+
 import time
 import copy
 
@@ -36,6 +38,7 @@ class WinCollector:
                 self.winDict['champions'][chmpId]['partners'][subChmpId]={'partnerName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0}
                 self.winDict['champions'][chmpId]['opponents'][subChmpId]={'opponentName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0}
         self.stater=stat_calc.StatCalc(self)
+        self.printer=sheets.PrintToSheets(self.stater)
     #returns a list of summIds        
     def examineGameHistory(self,keyPlayerId,mode):
         keyPlayerId=keyPlayerId
@@ -65,7 +68,7 @@ class WinCollector:
                     #game represents the key champion in the list of partners
                     partners=copy.copy(game['fellowPlayers'])
                     partners.append(game)
-                    print('champions in game:',partners)
+                    #print('champions in game:',partners)
                     self.partner(partners, game)
                     #for player in game['fellowPlayers']:
                     #        for pairPlayer in game['fellowPlayers']:
@@ -195,11 +198,12 @@ class WinCollector:
                 time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 100:
+            if len(self.lists['games']) - self.statedGames > 5:
                 print('total games collected:',self.winDict['totalGames'])
                 print('stats are:')
                 self.stater.calcAll()
-                self.stater.printCalcs()
+                self.printer.sheetUpdate()
+                #self.stater.printCalcs()
                 self.statedGames=len(self.lists['games'])
         #for summId in summsToPull:
             #self.spider(summId,gameMode)

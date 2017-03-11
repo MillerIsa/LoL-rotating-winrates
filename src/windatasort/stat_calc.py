@@ -22,8 +22,9 @@ class StatCalc:
     #adds adjusted winRate to statDict
     def adjWinRate(self):
         for chmpId in self.rawWins['champions']:
-            if self.rawWins['champions'][chmpId]['totalGames'] > 0:
-                self.statDict[chmpId]['adjWinRate'] = (self.rawWins['champions'][chmpId]['wins'] - self.rawWins['champions'][chmpId]['mirrorMatches']) / (self.rawWins['champions'][chmpId]['totalGames'] - 2 * self.rawWins['champions'][chmpId]['mirrorMatches'])
+            divisor=(self.rawWins['champions'][chmpId]['totalGames'] - 2 * self.rawWins['champions'][chmpId]['mirrorMatches'])
+            if divisor > 0:
+                self.statDict[chmpId]['adjWinRate'] = (self.rawWins['champions'][chmpId]['wins'] - self.rawWins['champions'][chmpId]['mirrorMatches']) / (divisor)
             else: 
                 self.statDict[chmpId]
     def popularity(self):
@@ -40,12 +41,13 @@ class StatCalc:
         self.adjWinRate()
         self.popularity()
         self.mirrorMatches()
+        return self.statDict
     def printCalcs(self):
         for chmpId in self.statDict:
             print(self.rawWins['champions'][chmpId])
-            for subId in self.rawWins['champions']:
-                print(self.rawWins['champions'][chmpId]['partners'][subId])
-                print(self.rawWins['champions'][chmpId]['opponents'][subId])
+            #for subId in self.rawWins['champions']:
+            #    print(self.rawWins['champions'][chmpId]['partners'][subId])
+            #    print(self.rawWins['champions'][chmpId]['opponents'][subId])
         
         
     
