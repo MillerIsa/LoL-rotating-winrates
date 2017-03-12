@@ -35,8 +35,8 @@ class WinCollector:
             for subChmpId in self.winDict['champions']:
                 subChmpName=chmpNames[subChmpId]
                 #mirror matches are not yet implemented for pairings
-                self.winDict['champions'][chmpId]['partners'][subChmpId]={'partnerName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0}
-                self.winDict['champions'][chmpId]['opponents'][subChmpId]={'opponentName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0}
+                self.winDict['champions'][chmpId]['partners'][subChmpId]={'partnerName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0,'winRate':-1}
+                self.winDict['champions'][chmpId]['opponents'][subChmpId]={'opponentName':subChmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0,'winRate':-1}
         self.stater=stat_calc.StatCalc(self)
         self.printer=sheets.PrintToSheets(self.stater)
     #returns a list of summIds        
@@ -198,7 +198,7 @@ class WinCollector:
                 time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 5:
+            if len(self.lists['games']) - self.statedGames > 40:
                 print('total games collected:',self.winDict['totalGames'])
                 print('stats are:')
                 self.stater.calcAll()

@@ -75,28 +75,45 @@ class PrintToSheets:
     
         spreadsheetId = '1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8'
         #rangeName = 'Class Data!A2:E'
-        body2={'requests':[{
-                'addProtectedRange':{
-                    'protectedRange':   {
-                        'prote ctedRangeId':1,
-                        'range':            {
-                            'winRates!A1':'E151'
-                                            }
-                                         }
-                                    }
-                           }
-                          ]
-              }
         #updates values in spreadsheet
         statDict=self.stater.calcAll()
         valueArray=[]
         x=0
         for chmpId in statDict:
             chmpEntry=statDict[chmpId]
-            print('chmpEntry is', chmpEntry)
-            valueArray.append([chmpEntry['chmpName'],chmpEntry['winRate'],chmpEntry['adjWinRate'],chmpEntry['mirrorMatches'],chmpEntry['popularity']])
+            chmpEntry2=self.stater.rawWins['champions'][chmpId]
+            valueArray.append([chmpEntry['chmpName'],chmpEntry['winRate'],chmpEntry['adjWinRate'],chmpEntry['mirrorMatches'],chmpEntry['popularity'],chmpEntry2['totalGames']])
             x+=1
+        z=0
+        
         print ('valueArray is:', valueArray)
+        
+        #make valueArray2, this array will contain correctly organized info on the champion partner pairings
+        valueArray2= [None] * (len(self.stater.rawWins) - 1)
+        #row 0 contains champion names
+        #column 0 reserved for names also
+        valueArray2[0]=['']
+        chmpOrder=[]
+        y=0
+        for chmpId in self.stater.rawWins['champions']:
+            chmpOrder.append(chmpId)
+            print('for chmpId:',chmpId)
+            valueArray2[0].append(self.stater.rawWins['champions'][chmpId]['chmpName'])
+            y+=1
+        m=1
+        for chmpId in chmpOrder:
+            chmpEntry=self.stater.rawWins['champions'][chmpId]
+            
+            valueArray2[m]=[self.stater.rawWins['champions'][chmpId]['chmpName']]
+            for subChmpId in chmpOrder:
+                print('for champId:',chmpId)
+                print('partner dictionary is:',self.stater.rawWins['champions'][chmpId]['partners'])
+                peerEntry=self.stater.rawWins['champions'][chmpId]['partners'][subChmpId]  
+                print('index to attempt is:',m)
+                print('valueArray2s length is:',len(valueArray2))
+                valueArray2[m].append(peerEntry['winRate'])
+            m+=1
+            
         
         body=   {
                     "valueInputOption":'RAW',
@@ -104,6 +121,17 @@ class PrintToSheets:
                         {
                                 "range":'winRates!A2:E151',
                                 "values":valueArray,
+                                "majorDimension":'ROWS'
+                        }
+                        ]
+                }
+        #range is a 150*150 square
+        body2=   {
+                    "valueInputOption":'RAW',
+                    "data": [
+                        {
+                                "range":'winRates!A1:EK150',
+                                #"values":valueArray2,
                                 "majorDimension":'ROWS'
                         }
                         ]

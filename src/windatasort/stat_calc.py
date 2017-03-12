@@ -11,7 +11,7 @@ class StatCalc:
         self.rawWins=self.winCollector.winDict
         self.statDict={}#contains dictionary of champion names mapped to dictionaries of various statistics for each champion
         for chmpId in self.rawWins['champions']:
-            self.statDict[chmpId]={'winRate':-1,'adjWinRate':-1,'mirrorMatches':0,'popularity':0,'chmpName':self.rawWins['champions'][chmpId]['chmpName']}
+            self.statDict[chmpId]={'winRate':-1,'adjWinRate':-1,'mirrorMatches':0,'popularity':0,'chmpName':self.rawWins['champions'][chmpId]['chmpName'],'partners':{},'opponents':{}}
     #adds winRate data to statDict
     def winRate(self):       
         for chmpId in self.rawWins['champions']:
@@ -19,12 +19,22 @@ class StatCalc:
                 self.statDict[chmpId]['winRate'] = self.rawWins['champions'][chmpId]['wins'] / self.rawWins['champions'][chmpId]['totalGames']
             else:
                 self.statDict[chmpId]['winRate'] = -1
+            #calculates win rates of champion pairings
+            for peerId in self.rawWins['champions'][chmpId]['partners']:
+                peer=self.rawWins['champions'][chmpId]['partners'][peerId]
+                try:peer['winRate']=peer['wins'] / peer['totalGames']
+                except ZeroDivisionError:peer['winRate']=-1
+            for oppId in self.rawWins['champions'][chmpId]['opponents']:
+                peer=self.rawWins['champions'][chmpId]['opponents'][oppId]
+                try:peer['winRate']=peer['wins'] / peer['totalGames']
+                except ZeroDivisionError:peer['winRate']=-1
     #adds adjusted winRate to statDict
     def adjWinRate(self):
         for chmpId in self.rawWins['champions']:
-            divisor=(self.rawWins['champions'][chmpId]['totalGames'] - 2 * self.rawWins['champions'][chmpId]['mirrorMatches'])
-            if divisor > 0:
+            try: 
+                divisor=(self.rawWins['champions'][chmpId]['totalGames'] - 2 * self.rawWins['champions'][chmpId]['mirrorMatches'])
                 self.statDict[chmpId]['adjWinRate'] = (self.rawWins['champions'][chmpId]['wins'] - self.rawWins['champions'][chmpId]['mirrorMatches']) / (divisor)
+            except ZeroDivisionError:self.statDict[chmpId]['adjWinRate']=-1
             else: 
                 self.statDict[chmpId]
     def popularity(self):
