@@ -198,7 +198,7 @@ class WinCollector:
                 time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 40:
+            if len(self.lists['games']) - self.statedGames > 150:
                 print('total games collected:',self.winDict['totalGames'])
                 print('stats are:')
                 self.stater.calcAll()

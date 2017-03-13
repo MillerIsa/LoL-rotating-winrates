@@ -89,7 +89,8 @@ class PrintToSheets:
         print ('valueArray is:', valueArray)
         
         #make valueArray2, this array will contain correctly organized info on the champion partner pairings
-        valueArray2= [None] * (len(self.stater.rawWins) - 1)
+        valueArray2= [None] * (len(self.stater.rawWins['champions']) + 2)
+        print('len(valueArray2 is):',len(valueArray2))
         #row 0 contains champion names
         #column 0 reserved for names also
         valueArray2[0]=['']
@@ -97,7 +98,7 @@ class PrintToSheets:
         y=0
         for chmpId in self.stater.rawWins['champions']:
             chmpOrder.append(chmpId)
-            print('for chmpId:',chmpId)
+            #print('for chmpId:',chmpId)
             valueArray2[0].append(self.stater.rawWins['champions'][chmpId]['chmpName'])
             y+=1
         m=1
@@ -106,11 +107,10 @@ class PrintToSheets:
             
             valueArray2[m]=[self.stater.rawWins['champions'][chmpId]['chmpName']]
             for subChmpId in chmpOrder:
-                print('for champId:',chmpId)
-                print('partner dictionary is:',self.stater.rawWins['champions'][chmpId]['partners'])
+                #print('for champId:',chmpId)        
                 peerEntry=self.stater.rawWins['champions'][chmpId]['partners'][subChmpId]  
-                print('index to attempt is:',m)
-                print('valueArray2s length is:',len(valueArray2))
+                #print('partner dictionary entry is:',self.stater.rawWins['champions'][chmpId]['partners'][subChmpId])
+                #print('index to attempt is:',m)
                 valueArray2[m].append(peerEntry['winRate'])
             m+=1
             
@@ -119,7 +119,7 @@ class PrintToSheets:
                     "valueInputOption":'RAW',
                     "data": [
                         {
-                                "range":'winRates!A2:E151',
+                                "range":'winRates!A2:F151',
                                 "values":valueArray,
                                 "majorDimension":'ROWS'
                         }
@@ -130,14 +130,16 @@ class PrintToSheets:
                     "valueInputOption":'RAW',
                     "data": [
                         {
-                                "range":'winRates!A1:EK150',
-                                #"values":valueArray2,
+                                "range":'pairings!A1:EK150',
+                                "values":valueArray2,
                                 "majorDimension":'ROWS'
                         }
                         ]
                 }
         result=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=body)
+        result2=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=body2)
         #executest the http request
         result.execute()
-        print(result)
+        result2.execute()
+        
 
