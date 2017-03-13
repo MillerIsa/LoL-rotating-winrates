@@ -29,7 +29,7 @@ class WinCollector:
             chmpName=chmpNames[chmpId]
             #the win rate of a particular pair is equal to the sum of the two pair entries. Ex: win rate of ahri,annie + annie,ahri = win rate of the annie ahri pairing
             #entries where chmpId and subChmpId are the same will have double the values
-            self.winDict['champions'][chmpId]={'chmpName':chmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0,'partners':{},'opponents':{}}
+            self.winDict['champions'][chmpId]={'chmpName':chmpName,'wins':0,'losses':0,'totalGames':0,'mirrorMatches':0,'winRate':-1,'adjWinRate':-1,'popularity':0,'partners':{},'opponents':{}}
         self.pairDict={}
         for chmpId in self.winDict['champions']:
             for subChmpId in self.winDict['champions']:

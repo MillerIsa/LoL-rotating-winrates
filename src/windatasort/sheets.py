@@ -76,11 +76,11 @@ class PrintToSheets:
         spreadsheetId = '1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8'
         #rangeName = 'Class Data!A2:E'
         #updates values in spreadsheet
-        statDict=self.stater.calcAll()
+        rawWins=self.stater.calcAll()
         valueArray=[]
         x=0
-        for chmpId in statDict:
-            chmpEntry=statDict[chmpId]
+        for chmpId in rawWins['champions']:
+            chmpEntry=rawWins['champions'][chmpId]
             chmpEntry2=self.stater.rawWins['champions'][chmpId]
             valueArray.append([chmpEntry['chmpName'],chmpEntry['winRate'],chmpEntry['adjWinRate'],chmpEntry['mirrorMatches'],chmpEntry['popularity'],chmpEntry2['totalGames']])
             x+=1

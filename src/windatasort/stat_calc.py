@@ -10,15 +10,15 @@ class StatCalc:
         self.winCollector=winCollector
         self.rawWins=self.winCollector.winDict
         self.statDict={}#contains dictionary of champion names mapped to dictionaries of various statistics for each champion
-        for chmpId in self.rawWins['champions']:
-            self.statDict[chmpId]={'winRate':-1,'adjWinRate':-1,'mirrorMatches':0,'popularity':0,'chmpName':self.rawWins['champions'][chmpId]['chmpName'],'partners':{},'opponents':{}}
-    #adds winRate data to statDict
+        #for chmpId in self.rawWins['champions']:
+        #    self.statDict[chmpId]={'winRate':-1,'adjWinRate':-1,'mirrorMatches':0,'popularity':0,'chmpName':self.rawWins['champions'][chmpId]['chmpName'],'partners':{},'opponents':{}}
+    #adds winRate data to rawWins['champions']
     def winRate(self):       
         for chmpId in self.rawWins['champions']:
             if self.rawWins['champions'][chmpId]['totalGames'] > 0:
-                self.statDict[chmpId]['winRate'] = self.rawWins['champions'][chmpId]['wins'] / self.rawWins['champions'][chmpId]['totalGames']
+                self.rawWins['champions'][chmpId]['winRate'] = self.rawWins['champions'][chmpId]['wins'] / self.rawWins['champions'][chmpId]['totalGames']
             else:
-                self.statDict[chmpId]['winRate'] = -1
+                self.rawWins['champions'][chmpId]['winRate'] = -1
             #calculates win rates of champion pairings
             for peerId in self.rawWins['champions'][chmpId]['partners']:
                 peer=self.rawWins['champions'][chmpId]['partners'][peerId]
@@ -28,32 +28,26 @@ class StatCalc:
                 peer=self.rawWins['champions'][chmpId]['opponents'][oppId]
                 try:peer['winRate']=peer['wins'] / peer['totalGames']
                 except ZeroDivisionError:peer['winRate']=-1
-    #adds adjusted winRate to statDict
+    #adds adjusted winRate to rawWins['champions']
     def adjWinRate(self):
         for chmpId in self.rawWins['champions']:
             try: 
                 divisor=(self.rawWins['champions'][chmpId]['totalGames'] - 2 * self.rawWins['champions'][chmpId]['mirrorMatches'])
-                self.statDict[chmpId]['adjWinRate'] = (self.rawWins['champions'][chmpId]['wins'] - self.rawWins['champions'][chmpId]['mirrorMatches']) / (divisor)
-            except ZeroDivisionError:self.statDict[chmpId]['adjWinRate']=-1
-            else: 
-                self.statDict[chmpId]
+                self.rawWins['champions'][chmpId]['adjWinRate'] = (self.rawWins['champions'][chmpId]['wins'] - self.rawWins['champions'][chmpId]['mirrorMatches']) / (divisor)
+            except ZeroDivisionError:self.rawWins['champions'][chmpId]['adjWinRate']=-1
     def popularity(self):
-        for chmpId in self.statDict:
+        for chmpId in self.rawWins['champions']:
             if self.rawWins['totalGames'] == 0:
-                self.statDict[chmpId]['popularity']=-1
+                self.rawWins['champions'][chmpId]['popularity']=-1
             else:
-                self.statDict[chmpId]['popularity']= self.rawWins['champions'][chmpId]['totalGames'] / self.rawWins['totalGames']
-    def mirrorMatches(self):
-        for chmpId in self.statDict:
-            self.statDict[chmpId]['mirrorMatches']=self.rawWins['champions'][chmpId]['mirrorMatches']
+                self.rawWins['champions'][chmpId]['popularity']= self.rawWins['champions'][chmpId]['totalGames'] / self.rawWins['totalGames']
     def calcAll(self):
         self.winRate()
         self.adjWinRate()
         self.popularity()
-        self.mirrorMatches()
-        return self.statDict
+        return self.rawWins
     def printCalcs(self):
-        for chmpId in self.statDict:
+        for chmpId in rawWins['champions']:
             print(self.rawWins['champions'][chmpId])
             #for subId in self.rawWins['champions']:
             #    print(self.rawWins['champions'][chmpId]['partners'][subId])
