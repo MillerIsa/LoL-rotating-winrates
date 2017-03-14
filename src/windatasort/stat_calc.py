@@ -46,6 +46,8 @@ class StatCalc:
         self.adjWinRate()
         self.popularity()
         return self.rawWins
+    #deprecated
+    #all calls for printing should be made to the sheets module
     def printCalcs(self):
         for chmpId in self.rawWins['champions']:
             print(self.rawWins['champions'][chmpId])

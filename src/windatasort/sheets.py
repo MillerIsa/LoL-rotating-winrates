@@ -103,6 +103,7 @@ class PrintToSheets:
             chmpOrder.append(chmpId)
             #print('for chmpId:',chmpId)
             valueArray2[0].append(self.stater.rawWins['champions'][chmpId]['chmpName'])
+            opponentArray[0].append(self.stater.rawWins['champions'][chmpId]['chmpName'])
             y+=1
         m=1
         for chmpId in chmpOrder:
@@ -114,16 +115,18 @@ class PrintToSheets:
             for subChmpId in chmpOrder:
                 #print('for champId:',chmpId)
                 oppEntry= self.stater.rawWins['champions'][chmpId]['opponents'][subChmpId] 
+                oppWinRate=oppEntry['winRate']
                 if chmpId >= subChmpId:      
                     allyEntry=self.stater.rawWins['champions'][chmpId]['partners'][subChmpId]  
                 else:
                     #swap chmpId and subChmp Id so as to match Hi - low pairing format
                     allyEntry=self.stater.rawWins['champions'][subChmpId]['partners'][chmpId]
-                    #oppEntry=self.stater.rawWins['champions'][subChmpId]['opponents'][chmpId]  
-                #print('partner dictionary entry is:',self.stater.rawWins['champions'][chmpId]['partners'][subChmpId])
-                #print('index to attempt is:',m)
+                    #following two lines convert data entry to accurately represent opp win rates when (chmpId < subChmpId)
+                    oppEntry= self.stater.rawWins['champions'][subChmpId]['opponents'][chmpId]
+                    oppWinRate= 1 - oppEntry['winRate']
+                    if oppWinRate == 2:oppWinRate=-1
                 valueArray2[m].append(allyEntry['winRate'])
-                opponentArray[m].append(oppEntry['winRate'])
+                opponentArray[m].append(oppWinRate)
             m+=1
             
         
