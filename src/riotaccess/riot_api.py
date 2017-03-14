@@ -29,7 +29,8 @@ class RiotAPI(object):
     #@return: dictionary object OR an integer representing the http response code in case of response failure
     #rate limits are applied properly when request method is called through tenMinLimit()
     #check http response code before attempting to use response data
-    def _request(self, api_url,is_static=False, params={}):
+    def _request(self, api_url,is_static=False, params={},retryDelay=1):
+        
         if is_static:
             args = {'api_key':self.api_key}
             for key, value in params.items():
@@ -45,7 +46,13 @@ class RiotAPI(object):
                 params=args
                 )
             if response.status_code == 200:return response.json()
+            else:
+                print('response.status_code:', + response.status_code + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + retryDelay + ' seconds')
+                time.sleep(retryDelay)
+                if retryDelay < 600:retryDelay += 10
+                return self._request(api_url, is_static,retryDelay=retryDelay)
             return response.status_code
+
                 
                       
             
@@ -107,6 +114,12 @@ class RiotAPI(object):
                 else:print('Rate limit was enforced by the underlying service to which the request was proxied.')
                 return response.status_code
             if response.status_code == 200: return response.json()
+            else:
+                print('response.status_code:', + response.status_code + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + retryDelay + ' seconds')
+                time.sleep(retryDelay)
+                if retryDelay < 600:retryDelay += 10
+                return self._request(api_url, is_static,retryDelay=retryDelay)
+                
         else:
             if self.secLim['countLeft'] == 0:
                 retryAfter=10 - (time.process_time() - self.secLim['timeSent'])

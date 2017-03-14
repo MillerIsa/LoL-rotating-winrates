@@ -113,13 +113,13 @@ class PrintToSheets:
             
             for subChmpId in chmpOrder:
                 #print('for champId:',chmpId)
+                oppEntry= self.stater.rawWins['champions'][chmpId]['opponents'][subChmpId] 
                 if chmpId >= subChmpId:      
-                    allyEntry=self.stater.rawWins['champions'][chmpId]['partners'][subChmpId] 
-                    oppEntry= self.stater.rawWins['champions'][chmpId]['opponents'][subChmpId] 
+                    allyEntry=self.stater.rawWins['champions'][chmpId]['partners'][subChmpId]  
                 else:
                     #swap chmpId and subChmp Id so as to match Hi - low pairing format
                     allyEntry=self.stater.rawWins['champions'][subChmpId]['partners'][chmpId]
-                    oppEntry=self.stater.rawWins['champions'][subChmpId]['opponents'][chmpId]  
+                    #oppEntry=self.stater.rawWins['champions'][subChmpId]['opponents'][chmpId]  
                 #print('partner dictionary entry is:',self.stater.rawWins['champions'][chmpId]['partners'][subChmpId])
                 #print('index to attempt is:',m)
                 valueArray2[m].append(allyEntry['winRate'])

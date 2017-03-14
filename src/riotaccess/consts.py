@@ -48,3 +48,12 @@ GAME_MODES = {
     'snowdown_showdown':GameMode('FIRSTBLOOD','FIRSTBLOOD_1x1')    
     }
 
+RESPONSE_CODES = {
+    400:'Bad request',
+    401:'Unauthorized',
+    404:'Game data not found',
+    429:'Rate limit exceeded',
+    500:'Internal server error',
+    503:'Service unavailable'
+    }
+

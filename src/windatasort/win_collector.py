@@ -152,6 +152,7 @@ class WinCollector:
     #logs all pair win/losses in the given list of partners for the game given
     #@ param "partners" each partner must be a dictionary with the following keys: 'teamId','championId'
     #at all times win losses for a champion pair are stored in the High Id, Low Id dictionary entry. But all mirror pairings are double counted, win rate calculation should be unaffected by this.
+    # for opponent pairings it is accurately stored in both pairs
     def partner(self,partners,game):
         keyTeamId=game['teamId']
         for player in partners:
