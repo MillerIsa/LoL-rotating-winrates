@@ -172,6 +172,7 @@ class RiotAPI(object):
         'returns a dictionary of champion ids mapped to champion names'
         chmpDict={}
         tempDict=self.get_champion_list()
+        if type(tempDict) != dict:print('error retriving chmpNames:',tempDict)
         for name in tempDict['data']:
             chmpDict[tempDict['data'][name]['id']]=name
         return chmpDict

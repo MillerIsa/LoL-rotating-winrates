@@ -47,7 +47,7 @@ class StatCalc:
         self.popularity()
         return self.rawWins
     def printCalcs(self):
-        for chmpId in rawWins['champions']:
+        for chmpId in self.rawWins['champions']:
             print(self.rawWins['champions'][chmpId])
             #for subId in self.rawWins['champions']:
             #    print(self.rawWins['champions'][chmpId]['partners'][subId])

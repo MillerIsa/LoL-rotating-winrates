@@ -89,11 +89,14 @@ class PrintToSheets:
         print ('valueArray is:', valueArray)
         
         #make valueArray2, this array will contain correctly organized info on the champion partner pairings
-        valueArray2= [None] * (len(self.stater.rawWins['champions']) + 2)
+        numChamps=len(self.stater.rawWins['champions']) + 2
+        valueArray2= [None] * (numChamps)
+        opponentArray= [None] * (numChamps)
         print('len(valueArray2 is):',len(valueArray2))
         #row 0 contains champion names
         #column 0 reserved for names also
         valueArray2[0]=['']
+        opponentArray[0]=['']
         chmpOrder=[]
         y=0
         for chmpId in self.stater.rawWins['champions']:
@@ -106,12 +109,21 @@ class PrintToSheets:
             chmpEntry=self.stater.rawWins['champions'][chmpId]
             
             valueArray2[m]=[self.stater.rawWins['champions'][chmpId]['chmpName']]
+            opponentArray[m]=[self.stater.rawWins['champions'][chmpId]['chmpName']]
+            
             for subChmpId in chmpOrder:
-                #print('for champId:',chmpId)        
-                peerEntry=self.stater.rawWins['champions'][chmpId]['partners'][subChmpId]  
+                #print('for champId:',chmpId)
+                if chmpId >= subChmpId:      
+                    allyEntry=self.stater.rawWins['champions'][chmpId]['partners'][subChmpId] 
+                    oppEntry= self.stater.rawWins['champions'][chmpId]['opponents'][subChmpId] 
+                else:
+                    #swap chmpId and subChmp Id so as to match Hi - low pairing format
+                    allyEntry=self.stater.rawWins['champions'][subChmpId]['partners'][chmpId]
+                    oppEntry=self.stater.rawWins['champions'][subChmpId]['opponents'][chmpId]  
                 #print('partner dictionary entry is:',self.stater.rawWins['champions'][chmpId]['partners'][subChmpId])
                 #print('index to attempt is:',m)
-                valueArray2[m].append(peerEntry['winRate'])
+                valueArray2[m].append(allyEntry['winRate'])
+                opponentArray[m].append(oppEntry['winRate'])
             m+=1
             
         
@@ -126,7 +138,7 @@ class PrintToSheets:
                         ]
                 }
         #range is a 150*150 square
-        body2=   {
+        partnerBody=   {
                     "valueInputOption":'RAW',
                     "data": [
                         {
@@ -136,10 +148,22 @@ class PrintToSheets:
                         }
                         ]
                 }
+        opponentBody=   {
+                    "valueInputOption":'RAW',
+                    "data": [
+                        {
+                                "range":'opponents!A1:EK150',
+                                "values":opponentArray,
+                                "majorDimension":'ROWS'
+                        }
+                        ]
+                }
         result=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=body)
-        result2=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=body2)
+        result2=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=partnerBody)
+        result3=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=opponentBody)
         #executest the http request
         result.execute()
         result2.execute()
+        result3.execute()
         
 

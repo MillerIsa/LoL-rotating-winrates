@@ -151,6 +151,7 @@ class WinCollector:
         return summIdList
     #logs all pair win/losses in the given list of partners for the game given
     #@ param "partners" each partner must be a dictionary with the following keys: 'teamId','championId'
+    #at all times win losses for a champion pair are stored in the High Id, Low Id dictionary entry. But all mirror pairings are double counted, win rate calculation should be unaffected by this.
     def partner(self,partners,game):
         keyTeamId=game['teamId']
         for player in partners:
@@ -171,8 +172,7 @@ class WinCollector:
                     
                                 
     #@param rootPlayer is the summoner id of the player to start spidering from
-    #@param string representing game mode 
-    #!!!!!!!IMPLIMENT RATE LIMITITNG BEFORE RUNNIG PROGRAM AGAIN. This method will exceed rate limit every time otherwise!!!!!!     
+    #@param string representing game mode    
     def spider(self,rootPlayer,gameMode):
         'pulls game data for statistical analysis and stores the portions of the data in winDict' 
       
@@ -194,8 +194,7 @@ class WinCollector:
             while (s < len(newSumms)):
                 summsToPull.append(newSumms[s])
                 s+=1
-                #prevent method from nomming all cpu during testing phaseS
-                time.sleep(.001)
+                #time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
             if len(self.lists['games']) - self.statedGames > 150:
