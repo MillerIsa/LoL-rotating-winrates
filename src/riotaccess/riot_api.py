@@ -10,12 +10,7 @@ import time
 from riotaccess.consts import API_VERSIONS
 #import ratelimit
 
-class RiotAPI(object):
-    #count of requests left in 10 seconds, count of requests left in 600 seconds,time that first request in the time window was sent for each
-    #class PrevReq:
-        #def __init__(self):
-            #self.secLim={'countLeft':10,'timeSent':}
-            #self.minLim{'countLeft':600,'timeSent':}        
+class RiotAPI(object):       
 
     def __init__(self, api_key, region=consts.REGIONS['north_america']):
         self.api_key = api_key
@@ -37,17 +32,10 @@ class RiotAPI(object):
                 if key not in args:
                     args[key] = value
             base=consts.URL['static_base']
-            response = requests.get(           
-                base.format (
-                    proxy=self.region,
-                    region=self.region,
-                    url=api_url
-                    ),
-                params=args
-                )
+            response = self.httpRequest(base, api_url, args)
             if response.status_code == 200:return response.json()
             else:
-                print('response.status_code:', + response.status_code + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + retryDelay + ' seconds')
+                print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
                 time.sleep(retryDelay)
                 if retryDelay < 600:retryDelay += 10
                 return self._request(api_url, is_static,retryDelay=retryDelay)
@@ -68,14 +56,7 @@ class RiotAPI(object):
                 if key not in args:
                     args[key] = value  
             base=consts.URL['base']
-            response = requests.get(           
-                base.format (
-                    proxy=self.region,
-                    region=self.region,
-                    url=api_url
-                    ),
-                params=args
-                )
+            response=self.httpRequest(base, api_url, args)
             if response.status_code == 200 or response.status_code == 429:
                 #record request info for rate limit management 
                 newTime=time.process_time()
@@ -115,7 +96,7 @@ class RiotAPI(object):
                 return response.status_code
             if response.status_code == 200: return response.json()
             else:
-                print('response.status_code:', + response.status_code + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + retryDelay + ' seconds')
+                print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
                 time.sleep(retryDelay)
                 if retryDelay < 600:retryDelay += 10
                 return self._request(api_url, is_static,retryDelay=retryDelay)
@@ -123,19 +104,34 @@ class RiotAPI(object):
         else:
             if self.secLim['countLeft'] == 0:
                 retryAfter=10 - (time.process_time() - self.secLim['timeSent'])
-                if retryAfter < 0.1:retryAfter=0.1
+                if retryAfter < 0.01:retryAfter=0.01
                 print('retryAfter:',retryAfter)
                 self.secLim['timeSent']-=retryAfter
                 time.sleep(retryAfter)
                 return self._request(api_url, is_static)
             if self.minLim['countLeft'] == 0:
                 retryAfter=600 - (time.process_time() - self.minLim['timeSent'])
-                if retryAfter < 0.1:retryAfter=0.1
+                if retryAfter < 0.01:retryAfter=0.01
                 self.minLim['timeSent']-=retryAfter
                 time.sleep(retryAfter)
                 return self._request(api_url, is_static)
         return 0
-    
+    def httpRequest(self,base,api_url,args,retryAfter=60):
+        try:
+                response = requests.get(           
+                    base.format (
+                        proxy=self.region,
+                        region=self.region,
+                        url=api_url
+                        ),
+                    params=args
+                    )
+                return response
+        except:
+            print('error requesting url, retry after:',str(retryAfter))
+            time.sleep(retryAfter)
+            return self.httpRequest(base, api_url, args, retryAfter)
+        
  
     
     #does NOT count against rate limit
@@ -190,9 +186,7 @@ class RiotAPI(object):
             chmpDict[tempDict['data'][name]['id']]=name
         return chmpDict
     
-    #@rate_limited(500, 600)
-    #def tenSecLim(self):
-    #   return True
+
             
         
 

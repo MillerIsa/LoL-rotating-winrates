@@ -70,22 +70,6 @@ class WinCollector:
                     partners.append(game)
                     #print('champions in game:',partners)
                     self.partner(partners, game)
-                    #for player in game['fellowPlayers']:
-                    #        for pairPlayer in game['fellowPlayers']:
-                    #            pairId=pairPlayer['championId']
-                    #            if mChmpId >= pairId:
-                    #                if (player['teamId'] == keyTeamId):
-                    #                    if game['stats']['win']:
-                    #                        self.winDict['champions'][mChmpId]['partners'][pairId]['wins']+=1
-                    #                    else:
-                    #                        self.winDict['champions'][mChmpId]['partners'][pairId]['losses']+=1
-                    #                    self.winDict['champions'][mChmpId]['partners'][pairId]['totalGames']+=1
-                    #                else:
-                    #                    if game['stats']['win']:
-                    #                        self.winDict['champions'][mChmpId]['opponents'][pairId]['losses']+=1
-                    #                    else:
-                    #                        self.winDict['champions'][mChmpId]['opponents'][pairId]['wins']+=1
-                    #                    self.winDict['champions'][mChmpId]['opponents'][pairId]['totalGames']+=1
                     
                 #dictionary to test for mirror matches
                     mirrorDict={}
@@ -113,35 +97,6 @@ class WinCollector:
                         #logs chmp pairing data
                         
                         
-                        #for pairPlayer in game['fellowPlayers']:
-                        #    pairId=pairPlayer['championId']
-                        #    
-                        #    if chmpId >= pairId:
-                        #            if (player['teamId'] == keyTeamId):
-                        #                if game['stats']['win']:
-                        #                    self.winDict['champions'][chmpId]['partners'][pairId]['wins']+=1
-                        #                else:
-                        #                    self.winDict['champions'][chmpId]['partners'][pairId]['losses']+=1
-                        #                self.winDict['champions'][chmpId]['partners'][pairId]['totalGames']+=1
-                        #            else:
-                        #                if game['stats']['win']:
-                        #                    self.winDict['champions'][chmpId]['opponents'][pairId]['losses']+=1
-                        #                else:
-                        #                    self.winDict['champions'][chmpId]['opponents'][pairId]['wins']+=1
-                        #                self.winDict['champions'][chmpId]['opponents'][pairId]['totalGames']+=1
-                        #if chmpId >= mChmpId:
-                        #    if (player['teamId'] == keyTeamId):
-                        #        if game['stats']['win']:
-                        #            self.winDict['champions'][chmpId]['partners'][mChmpId]['wins']+=1
-                        #        else:
-                        #            self.winDict['champions'][chmpId]['partners'][mChmpId]['losses']+=1
-                        #        self.winDict['champions'][chmpId]['partners'][mChmpId]['totalGames']+=1
-                        #    else:
-                        #        if game['stats']['win']:
-                        #            self.winDict['champions'][chmpId]['opponents'][mChmpId]['losses']+=1
-                        #        else:
-                        #            self.winDict['champions'][chmpId]['opponents'][mChmpId]['wins']+=1
-                        #        self.winDict['champions'][chmpId]['opponents'][mChmpId]['totalGames']+=1
                             
                     for chmpId in mirrorDict:
                         if mirrorDict[chmpId] % 2 == 0:
@@ -227,13 +182,7 @@ class WinCollector:
     #add an entry to the list if it is not already in there. Split the list in half until the correct index is located
     def addId2(self,newId,listKey):
         reList=self.lists[listKey]
-        #testInd=len(reList) // 2 
-        #print('test index is:',testInd)
-        #if reList[testInd - 1] < newId < reList[testInd]:
-        #    reList.insert(testInd,newId)
-        #    return True
-        #if reList[testInd] == newId:
-        #    return False
+       
         leftInd=-1
         rightInd=len(reList)
         #never test the right or left indexes. They are guaranteed to not be the target value
