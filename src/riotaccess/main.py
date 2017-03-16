@@ -9,7 +9,7 @@ import passkey
 import consts
 from windatasort.win_collector import WinCollector
 def main(rootSumm='Direwolf23',gameMode='normals'):
-    PrintToReddit().updateTable()
+    PrintToReddit().updateTable2()
     api=initialize()   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
     #36179556
@@ -23,7 +23,7 @@ def main(rootSumm='Direwolf23',gameMode='normals'):
     #print (winning.winDict)
     #print('lists are:',winning.lists)
     
-    print('Total games collected:',winning.getGamesCollected())
+    print('Total games collected:',winning.totalGames)
     #print('GameIds',winning.lists['games'])
 
 def initialize():

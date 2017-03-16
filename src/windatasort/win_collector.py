@@ -221,7 +221,7 @@ class WinCollector:
     #deprecated - use self.totalGames instead
     def getGamesCollected(self):
         collectedGames=0
-        for chmpEntry in self.winDic['champions']:
+        for chmpEntry in self.winDict['champions']:
             print('do not call getGamesCollected()',self.winDict['champions'][chmpEntry])
             collectedGames+=self.winDict['champions'][chmpEntry]['totalGames']
         return collectedGames #/ 10
