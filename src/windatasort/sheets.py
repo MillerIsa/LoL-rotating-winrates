@@ -34,8 +34,6 @@ def get_credentials():
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
     spef_cred_dir=os.path.join(credential_dir,'.sheets.googleapis.com-lol-stat-updater.json')
-    print('os.path.exists:',os.path.exists(credential_dir))
-    print('specific os.path.exists:',os.path.exists(spef_cred_dir))
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
     #if not os.path.exists(spef_cred_dir):
@@ -168,5 +166,51 @@ class PrintToSheets:
         result.execute()
         result2.execute()
         result3.execute()
+#prints from sheets to reddit compatible text mark-up file
+class PrintToReddit:
+    def __init__(self):
+        credentials = get_credentials()
+        http = credentials.authorize(httplib2.Http())
+        discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
+                        'version=v4')
+        self.service = discovery.build('sheets', 'v4', http=http,
+                                  discoveryServiceUrl=discoveryUrl)
+    def updateTable(self):
         
+        
+        spreadsheatId="1Sr_xuN1Kv3xexn8uU3hjm3goMZ7GbnDuzUgVWFrDNzA"
+        subSheetName="Ascension-3/15/2017"
+        cellRange='A1:F135'
+        
+        request=self.service.spreadsheets().values().get(spreadsheetId=spreadsheatId, range=subSheetName.join([cellRange]), majorDimension=None, dateTimeRenderOption=None, valueRenderOption=None, x__xgafv=None)
+        result=request.execute()
+        print('result is:',result)
+        
+        
+        filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\redditAscension3-14-2017.txt'
+        
+        #unpacks the data from google sheets into the table format for reddit
+        file = open(filePath,'w')
+        file.write(result['values'][0][0])
+        z=1
+        alignmentStr=':--'
+        while z < len(result['values'][0]):
+            file.write(''.join( ['|',result['values'][0][z]] ))
+            z+=1
+            alignmentStr+=':--'
+        file.write(''.join(['\n',alignmentStr,'\n']))
+        y=1
+        while y < len(result['values']):
+            rowEntry=result['values'][y]
+            file.write(rowEntry[0])
+            y+=1
+            x=1
+            while x < len(rowEntry):
+                file.write(''.join( ['|',rowEntry[x]] ))
+                x+=1
+            file.write('\n')
+        file.close()
+            
+                
+         
 

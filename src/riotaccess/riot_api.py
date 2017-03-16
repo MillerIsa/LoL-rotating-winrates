@@ -35,7 +35,8 @@ class RiotAPI(object):
             response = self.httpRequest(base, api_url, args)
             if response.status_code == 200:return response.json()
             else:
-                print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
+                print('response.status_code:'.join([str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
+                #print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
                 time.sleep(retryDelay)
                 if retryDelay < 600:retryDelay += 10
                 return self._request(api_url, is_static,retryDelay=retryDelay)
@@ -96,7 +97,8 @@ class RiotAPI(object):
                 return response.status_code
             if response.status_code == 200: return response.json()
             else:
-                print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
+                print('response.status_code:'.join([str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
+                #print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
                 time.sleep(retryDelay)
                 if retryDelay < 600:retryDelay += 10
                 return self._request(api_url, is_static,retryDelay=retryDelay)

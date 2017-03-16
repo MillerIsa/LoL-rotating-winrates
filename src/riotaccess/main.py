@@ -4,10 +4,12 @@ Created on Feb 17, 2017
 @author: Brian-VAIO
 '''
 from riot_api import RiotAPI 
+from sheets import PrintToReddit
 import passkey
 import consts
 from windatasort.win_collector import WinCollector
 def main(rootSumm='Direwolf23',gameMode='normals'):
+    PrintToReddit().updateTable()
     api=initialize()   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
     #36179556
