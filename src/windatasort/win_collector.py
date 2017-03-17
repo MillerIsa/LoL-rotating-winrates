@@ -43,7 +43,7 @@ class WinCollector:
     def examineGameHistory(self,keyPlayerId,mode):
         keyPlayerId=keyPlayerId
         summIdList=[]
-        print('player to retrieve history on:',keyPlayerId)
+        #print('player to retrieve history on:',keyPlayerId)
         history=self.api.get_game_history(keyPlayerId)
         if type(history) == dict:
             try:
@@ -53,6 +53,7 @@ class WinCollector:
                 return summIdList
             for game in games:
                 #executes suite only if the game is of the correct mode and not already counted
+                #print('game found:',game)
                 if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'],'games'): 
                     keyTeamId=game['teamId'] 
                     self.winDict['totalGames']+=1            
@@ -139,8 +140,8 @@ class WinCollector:
         x=0
         for summ in summsToPull:
             x+=1
-            print('summ in list:',summ)
-        print('summsFound:',x)
+            #print('summ in list:',summ)
+        #print('summsFound:',x)
         i=0
         while (i < len(summsToPull)):
             summ=summsToPull[i]
@@ -153,9 +154,8 @@ class WinCollector:
                 #time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 150:
+            if len(self.lists['games']) - self.statedGames > 50:
                 print('total games collected:',self.winDict['totalGames'])
-                print('stats are:')
                 self.stater.calcAll()
                 self.printer.sheetUpdate()
                 #self.stater.printCalcs()
@@ -194,12 +194,12 @@ class WinCollector:
             #print('test index is:',testInd)
             if reList[testInd - 1] < newId < reList[testInd]:
                 reList.insert(testInd,newId)
-                print('number of index checks:',y)
-                print('for list length of:',len(reList))
+                #print('number of index checks:',y)
+                #print('for list length of:',len(reList))
                 return True
             if reList[testInd] == newId:
-                print('number of index checks:',y)
-                print('for list length of:',len(reList))
+                #print('number of index checks:',y)
+                #print('for list length of:',len(reList))
                 return False
             if newId < reList[testInd]:
                 rightInd=testInd# - 1
@@ -209,8 +209,8 @@ class WinCollector:
         while (x < rightInd and newId >= reList[x]):
             y+=1
             if reList[x] == newId:
-                print('number of index checks:',y)
-                print('for list length of:',len(reList))
+                #print('number of index checks:',y)
+                #print('for list length of:',len(reList))
                 return False
             x+=1
         reList.insert(x,newId)
@@ -218,7 +218,7 @@ class WinCollector:
             
             
             
-    #deprecated - use self.totalGames instead
+    #deprecated - use "self.winDic['totalGames']" instead
     def getGamesCollected(self):
         collectedGames=0
         for chmpEntry in self.winDict['champions']:

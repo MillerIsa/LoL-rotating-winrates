@@ -71,7 +71,7 @@ class PrintToSheets:
         service = discovery.build('sheets', 'v4', http=http,
                                   discoveryServiceUrl=discoveryUrl)
     
-        spreadsheetId = '1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8'
+        spreadsheetId = '13xtXU-4gAEzlMb0uvmfzMENsmbmtLRA9kXeeZnPSl4I'
         #rangeName = 'Class Data!A2:E'
         #updates values in spreadsheet
         rawWins=self.stater.calcAll()
@@ -90,25 +90,35 @@ class PrintToSheets:
         numChamps=len(self.stater.rawWins['champions']) + 2
         valueArray2= [None] * (numChamps)
         opponentArray= [None] * (numChamps)
+        partNumGamesArr= [None] * (numChamps)
+        oppNumGamesArr= [None] * (numChamps)
         print('len(valueArray2 is):',len(valueArray2))
         #row 0 contains champion names
         #column 0 reserved for names also
         valueArray2[0]=['']
         opponentArray[0]=['']
+        partNumGamesArr[0]=['']
+        oppNumGamesArr[0]=['']
         chmpOrder=[]
         y=0
         for chmpId in self.stater.rawWins['champions']:
             chmpOrder.append(chmpId)
             #print('for chmpId:',chmpId)
-            valueArray2[0].append(self.stater.rawWins['champions'][chmpId]['chmpName'])
-            opponentArray[0].append(self.stater.rawWins['champions'][chmpId]['chmpName'])
+            chmpName=self.stater.rawWins['champions'][chmpId]['chmpName']
+            valueArray2[0].append(chmpName)
+            opponentArray[0].append(chmpName)
+            partNumGamesArr[0].append(chmpName)
+            oppNumGamesArr[0].append(chmpName)
             y+=1
         m=1
         for chmpId in chmpOrder:
             chmpEntry=self.stater.rawWins['champions'][chmpId]
+            subChmpName=self.stater.rawWins['champions'][chmpId]['chmpName']
             
-            valueArray2[m]=[self.stater.rawWins['champions'][chmpId]['chmpName']]
-            opponentArray[m]=[self.stater.rawWins['champions'][chmpId]['chmpName']]
+            valueArray2[m]=[subChmpName]
+            opponentArray[m]=[subChmpName]
+            partNumGamesArr[m]=[subChmpName]
+            oppNumGamesArr[m]=[subChmpName]
             
             for subChmpId in chmpOrder:
                 #print('for champId:',chmpId)
@@ -124,10 +134,15 @@ class PrintToSheets:
                     oppWinRate= 1 - oppEntry['winRate']
                     if oppWinRate == 2:oppWinRate=-1
                 valueArray2[m].append(allyEntry['winRate'])
+                partNumGamesArr[m].append(allyEntry['totalGames'])
                 opponentArray[m].append(oppWinRate)
+                oppNumGamesArr[m].append(oppEntry['totalGames'])
+                
             m+=1
-            
         
+        #returns a two dimensional list of number of games for printing    
+        #def aggrPartGames():
+            
         body=   {
                     "valueInputOption":'RAW',
                     "data": [
@@ -149,6 +164,16 @@ class PrintToSheets:
                         }
                         ]
                 }
+        partNumGames=   {
+                    "valueInputOption":'RAW',
+                    "data": [
+                        {
+                                "range":'pairings sample size!A1:EK150',
+                                "values":partNumGamesArr,
+                                "majorDimension":'ROWS'
+                        }
+                        ]
+                }
         opponentBody=   {
                     "valueInputOption":'RAW',
                     "data": [
@@ -159,13 +184,37 @@ class PrintToSheets:
                         }
                         ]
                 }
+        oppNumGames=   {
+                    "valueInputOption":'RAW',
+                    "data": [
+                        {
+                                "range":'opponents sample size!A1:EK150',
+                                "values":oppNumGamesArr,
+                                "majorDimension":'ROWS'
+                        }
+                        ]
+                }
+        #test to see if data is valid
+        #print('opponentArray is:',opponentArray)
+        #print('oppNumGamesArr is:',oppNumGamesArr)
+        
+            
+        print('oppNumGamesArr is:',oppNumGamesArr)
+        print('partNumGamesArr is',partNumGamesArr)
         result=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=body)
         result2=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=partnerBody)
         result3=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=opponentBody)
-        #executest the http request
-        result.execute()
-        result2.execute()
-        result3.execute()
+        result4=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=partNumGames)
+        result5=service.spreadsheets().values().batchUpdate(spreadsheetId=spreadsheetId,body=oppNumGames)
+        #executest the http requests
+        try:
+            result.execute()
+            result2.execute()
+            result3.execute()
+            result4.execute()
+            result5.execute()
+        except:pass
+    
 #prints from sheets to reddit compatible text mark-up file
 class PrintToReddit:
     def __init__(self):
@@ -195,7 +244,7 @@ class PrintToReddit:
         alignmentStr=':--'
         while z < len(result['values'][0]):
             z+=1
-            alignmentStr+=':--'
+            alignmentStr='|'.join([alignmentStr,':--'])
         file.write(alignmentStr.join(['\n','\n']))
         y=1
         while y < len(result['values']):

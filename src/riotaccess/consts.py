@@ -6,7 +6,7 @@ Created on Feb 17, 2017
 
 URL = {
     'base':'https://{proxy}.api.pvp.net/api/lol/{region}/{url}',
-    'summoner_by_name':'v{version}/summoner/by-name/names',
+    'summoner_by_name':'v{version}/summoner/by-name/{names}',
     'summoner_by_id':'v{version}/summoner/{summonerIds}',
     'game_history':'v{version}/game/by-summoner/{summonerId}/recent',
     'match':'v{version}/match/{matchId}',

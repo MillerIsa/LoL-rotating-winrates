@@ -8,22 +8,25 @@ from sheets import PrintToReddit
 import passkey
 import consts
 from windatasort.win_collector import WinCollector
-def main(rootSumm='Direwolf23',gameMode='normals'):
-    PrintToReddit().updateTable2()
+def main(rootSumm='mantia',gameMode='ascension'):
+    #PrintToReddit().updateTable2()
     api=initialize()   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
     #36179556
-    rootSummId=api.get_summoner_by_name(rootSumm)['names']['id']
-    print ('rootSummId is:',rootSummId)
+    #print('returned:',api.get_summoner_by_name('mantia'))
+    rootSummId=api.get_summoner_by_name(rootSumm)[rootSumm]['id']
+    #print('rootSummName is:',rootSumm)
+    #print ('rootSummId is:',rootSummId)
     #print (r) 
     winning=WinCollector(api)
     winning.spider(rootSummId, consts.GAME_MODES[gameMode])
-    
+    print('times rate limit was exceeded:',api.timesLimExceeded)
     #winning.examineGameHistory(60683268,consts.GAME_MODES['poro_king'])
     #print (winning.winDict)
     #print('lists are:',winning.lists)
     
-    print('Total games collected:',winning.totalGames)
+    print('Total games collected:',winning.winDict['totalGames'])
+    #print ('winDict is:',winning.winDict)
     #print('GameIds',winning.lists['games'])
 
 def initialize():

@@ -19,13 +19,14 @@ class RiotAPI(object):
         #'timeSent' represents the time that the first request within the given time window was made
         self.secLim={'countLeft':10,'timeSent':initialTime}
         self.minLim={'countLeft':500,'timeSent':initialTime}  
+        self.timesLimExceeded=0
         
     #base request method, assumes dynamic request unless specified
     #@return: dictionary object OR an integer representing the http response code in case of response failure
     #rate limits are applied properly when request method is called through tenMinLimit()
     #check http response code before attempting to use response data
     def _request(self, api_url,is_static=False, params={},retryDelay=1):
-        
+        #print('api_url_is',api_url)
         if is_static:
             args = {'api_key':self.api_key}
             for key, value in params.items():
@@ -88,6 +89,7 @@ class RiotAPI(object):
                 if self.secLim['countLeft'] == 9:
                     self.secLim['timeSent']=newTime
             if response.status_code == 429:
+                self.timesLimExceeded+=1
                 if 'X-Rate-Limit-Type' in response.headers:
                     print(response.headers['X-Rate-Limit-Type'])
                     print('rate limit exceeded, retry after:',response.headers['Retry-After'])
@@ -104,20 +106,21 @@ class RiotAPI(object):
                 return self._request(api_url, is_static,retryDelay=retryDelay)
                 
         else:
-            if self.secLim['countLeft'] == 0:
+            if self.secLim['countLeft'] <= 0:
                 retryAfter=10 - (time.process_time() - self.secLim['timeSent'])
                 if retryAfter < 0.01:retryAfter=0.01
                 print('retryAfter:',retryAfter)
                 self.secLim['timeSent']-=retryAfter
                 time.sleep(retryAfter)
                 return self._request(api_url, is_static)
-            if self.minLim['countLeft'] == 0:
+            if self.minLim['countLeft'] <= 0:
                 retryAfter=600 - (time.process_time() - self.minLim['timeSent'])
                 if retryAfter < 0.01:retryAfter=0.01
                 self.minLim['timeSent']-=retryAfter
                 time.sleep(retryAfter)
                 return self._request(api_url, is_static)
-        return 0
+        print('error,Rate limiting bug occurred ','self.secLim[\'countLeft\'] is:',self.secLim['countLeft'],'self.minLim[\'countLeft\'] is:',self.minLim['countLeft'])
+        return 10
     def httpRequest(self,base,api_url,args,retryAfter=60):
         try:
                 response = requests.get(           
@@ -149,7 +152,9 @@ class RiotAPI(object):
         api_url=consts.URL['summoner_by_name'].format(
             version=consts.API_VERSIONS['summoner'],
             names=name
+            
             )
+        print('name to retriev is:',name)
         return self._request(api_url)
     
     #@param summ IDs can be in String form or number form (I think)
