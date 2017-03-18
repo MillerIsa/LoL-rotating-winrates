@@ -35,6 +35,8 @@ class StatCalc:
                 divisor=(self.rawWins['champions'][chmpId]['totalGames'] - 2 * self.rawWins['champions'][chmpId]['mirrorMatches'])
                 self.rawWins['champions'][chmpId]['adjWinRate'] = (self.rawWins['champions'][chmpId]['wins'] - self.rawWins['champions'][chmpId]['mirrorMatches']) / (divisor)
             except ZeroDivisionError:self.rawWins['champions'][chmpId]['adjWinRate']=-1
+    #popularity is defined as average number of times a champion appears per match. Ex: if Teemo appeared .27 times per game, popularity would be .27 or 27%.
+    #Max possible value of 200% occurs when both teams always pick a particular champion. 
     def popularity(self):
         for chmpId in self.rawWins['champions']:
             if self.rawWins['totalGames'] == 0:

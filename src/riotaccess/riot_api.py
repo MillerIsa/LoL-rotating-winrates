@@ -27,6 +27,8 @@ class RiotAPI(object):
     #check http response code before attempting to use response data
     def _request(self, api_url,is_static=False, params={},retryDelay=1):
         #print('api_url_is',api_url)
+        #adding sleep buffer to sleep times in this method helps prevent doomed to fail retry  attempts
+        sleepBuffer=.01
         if is_static:
             args = {'api_key':self.api_key}
             for key, value in params.items():
@@ -36,9 +38,9 @@ class RiotAPI(object):
             response = self.httpRequest(base, api_url, args)
             if response.status_code == 200:return response.json()
             else:
-                print('response.status_code:'.join([str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
+                print(''.join(['response.status_code:',str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
                 #print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
-                time.sleep(retryDelay)
+                time.sleep(retryDelay + sleepBuffer)
                 if retryDelay < 600:retryDelay += 10
                 return self._request(api_url, is_static,retryDelay=retryDelay)
             return response.status_code
@@ -93,15 +95,15 @@ class RiotAPI(object):
                 if 'X-Rate-Limit-Type' in response.headers:
                     print(response.headers['X-Rate-Limit-Type'])
                     print('rate limit exceeded, retry after:',response.headers['Retry-After'])
-                    time.sleep(int(response.headers['Retry-After']))
+                    time.sleep(int(response.headers['Retry-After']) + sleepBuffer)
                     return self._request(api_url, is_static)
                 else:print('Rate limit was enforced by the underlying service to which the request was proxied.')
                 return response.status_code
             if response.status_code == 200: return response.json()
             else:
-                print('response.status_code:'.join([str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
+                print(''.join(['response.status_code:',str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
                 #print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
-                time.sleep(retryDelay)
+                time.sleep(retryDelay + sleepBuffer)
                 if retryDelay < 600:retryDelay += 10
                 return self._request(api_url, is_static,retryDelay=retryDelay)
                 
@@ -111,13 +113,13 @@ class RiotAPI(object):
                 if retryAfter < 0.01:retryAfter=0.01
                 print('retryAfter:',retryAfter)
                 self.secLim['timeSent']-=retryAfter
-                time.sleep(retryAfter)
+                time.sleep(retryAfter + sleepBuffer)
                 return self._request(api_url, is_static)
             if self.minLim['countLeft'] <= 0:
                 retryAfter=600 - (time.process_time() - self.minLim['timeSent'])
                 if retryAfter < 0.01:retryAfter=0.01
                 self.minLim['timeSent']-=retryAfter
-                time.sleep(retryAfter)
+                time.sleep(retryAfter + sleepBuffer)
                 return self._request(api_url, is_static)
         print('error,Rate limiting bug occurred ','self.secLim[\'countLeft\'] is:',self.secLim['countLeft'],'self.minLim[\'countLeft\'] is:',self.minLim['countLeft'])
         return 10

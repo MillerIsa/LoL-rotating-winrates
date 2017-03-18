@@ -95,10 +95,10 @@ class PrintToSheets:
         print('len(valueArray2 is):',len(valueArray2))
         #row 0 contains champion names
         #column 0 reserved for names also
-        valueArray2[0]=['']
-        opponentArray[0]=['']
-        partNumGamesArr[0]=['']
-        oppNumGamesArr[0]=['']
+        valueArray2[0]=['champion']
+        opponentArray[0]=['champion']
+        partNumGamesArr[0]=['champion']
+        oppNumGamesArr[0]=['champion']
         chmpOrder=[]
         y=0
         for chmpId in self.stater.rawWins['champions']:
