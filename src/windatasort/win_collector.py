@@ -4,7 +4,7 @@ Created on Feb 20, 2017
 @author: Brian-VAIO
 '''
 from riotaccess.riot_api import RiotAPI 
-import consts
+from riotaccess import consts
 from builtins import int
 from windatasort import stat_calc
 from windatasort import sheets
@@ -154,7 +154,7 @@ class WinCollector:
                 #time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 50:
+            if len(self.lists['games']) - self.statedGames > 500:
                 print('total games collected:',self.winDict['totalGames'])
                 self.stater.calcAll()
                 self.printer.sheetUpdate()
@@ -165,7 +165,27 @@ class WinCollector:
             
         
     #@param mode is a GameMode object used to filter examined games down to the desired game mode using mode type and subtype (not yet implimented)
-    
+    #@param mode is the desired mode to pull games on
+    #@return game Id of the new game to spider from
+    def seedSumm(self,rootSumm,mode):
+        gamesToCheck=[]
+        summsToCheck=[rootSumm]
+        y=0
+        while y < len(summsToCheck):
+            history=self.api.get_game_history(summsToCheck[y])
+            for game in history['games']:
+                print('game is:',game)
+                if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'], 'games', insertOrNot=False):
+                    return summsToCheck[y]
+                else:
+                    for player in game['fellowPlayers']:
+                        summsToCheck.append(player['summonerId'])
+            y+=1
+        
+            
+        
+        
+        
         #api.get_game_history(keyPlayerId)['games'][0]['fellowPlayers'][0]
     #adds a game id to the list if it is not already listed, returns False if there is already a listing for that id else adds an id and returns true.
     #list is ordered from lowest to highest game id
@@ -180,7 +200,7 @@ class WinCollector:
         self.lists[listKey].insert(x, newId)
         return True
     #add an entry to the list if it is not already in there. Split the list in half until the correct index is located
-    def addId2(self,newId,listKey):
+    def addId2(self,newId,listKey,insertOrNot=True):
         reList=self.lists[listKey]
        
         leftInd=-1
@@ -193,7 +213,7 @@ class WinCollector:
             testInd=(rightInd + leftInd + 1) // 2 
             #print('test index is:',testInd)
             if reList[testInd - 1] < newId < reList[testInd]:
-                reList.insert(testInd,newId)
+                if insertOrNot:reList.insert(testInd,newId)
                 #print('number of index checks:',y)
                 #print('for list length of:',len(reList))
                 return True
@@ -213,9 +233,10 @@ class WinCollector:
                 #print('for list length of:',len(reList))
                 return False
             x+=1
-        reList.insert(x,newId)
+        if insertOrNot:reList.insert(x,newId)
         return True
-            
+    #finds a game to start spidering from   
+   
             
             
     #deprecated - use "self.winDic['totalGames']" instead

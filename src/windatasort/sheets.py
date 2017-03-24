@@ -225,17 +225,15 @@ class PrintToReddit:
         self.service = discovery.build('sheets', 'v4', http=http,
                                   discoveryServiceUrl=discoveryUrl)
 
-    def updateTable2(self):
-        spreadsheatId="1Sr_xuN1Kv3xexn8uU3hjm3goMZ7GbnDuzUgVWFrDNzA"
-        subSheetName="Ascension-3/15/2017"
-        cellRange='A1:F135'
+    def updateTable2(self,spreadsheatId="1Sr_xuN1Kv3xexn8uU3hjm3goMZ7GbnDuzUgVWFrDNzA",subSheetName="Ascension-3/15/2017",cellRange='A1:F135',filename="redditAscension3-14-2017.txt"):
+        
         
         request=self.service.spreadsheets().values().get(spreadsheetId=spreadsheatId, range=subSheetName.join([cellRange]), majorDimension=None, dateTimeRenderOption=None, valueRenderOption=None, x__xgafv=None)
         result=request.execute()
         print('result is:',result)
         
         
-        filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\redditAscension3-14-2017.txt'
+        filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\redditAscension3-17_18-2017.txt'
         
         #unpacks the data from google sheets into the table format for reddit
         file = open(filePath,'w')
