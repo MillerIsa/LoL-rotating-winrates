@@ -178,6 +178,7 @@ class WinCollector:
                 if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'], 'games', insertOrNot=False):
                     return summsToCheck[y]
                 else:
+                    print('game keys are:',game.keys())
                     for player in game['fellowPlayers']:
                         summsToCheck.append(player['summonerId'])
             y+=1
