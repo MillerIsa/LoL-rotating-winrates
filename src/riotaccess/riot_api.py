@@ -39,6 +39,7 @@ class RiotAPI(object):
             if response.status_code == 200:return response.json()
             else:
                 print(''.join(['response.status_code:',str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
+                print('failed api_url is:',api_url,' end of api_url')
                 #print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
                 time.sleep(retryDelay + sleepBuffer)
                 if retryDelay < 600:retryDelay += 10
@@ -96,14 +97,16 @@ class RiotAPI(object):
                     print(response.headers['X-Rate-Limit-Type'])
                     print('rate limit exceeded, retry after:',response.headers['Retry-After'])
                     time.sleep(int(response.headers['Retry-After']) + sleepBuffer)
-                    self.secLim['timeSent']-=(response.headers['Retry-After'] + sleepBuffer)
-                    self.minLim['timeSent']-=(response.headers['Retry-After'] + sleepBuffer)
+                    self.secLim['timeSent']-=(float(response.headers['Retry-After']) + sleepBuffer)
+                    self.minLim['timeSent']-=(float(response.headers['Retry-After']) + sleepBuffer)
                     return self._request(api_url, is_static)
                 else:print('Rate limit was enforced by the underlying service to which the request was proxied.')
                 return response.status_code
             if response.status_code == 200: return response.json()
             else:
+                
                 print(''.join(['response.status_code:',str(response.status_code),', ',consts.RESPONSE_CODES[response.status_code],'. Retry after:',str(retryDelay),' seconds']))
+                print('failed api_url is:',api_url)
                 #print('response.status_code:', + str(response.status_code) + ', ' + consts.RESPONSE_CODES[response.status_code] + '. Retry after:' + str(retryDelay) + ' seconds')
                 time.sleep(retryDelay + sleepBuffer)
                 self.secLim['timeSent']-=(retryDelay + sleepBuffer)

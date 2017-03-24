@@ -181,9 +181,15 @@ class WinCollector:
                 if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'], 'games', insertOrNot=False):
                     return summsToCheck[y]
                 else:
+<<<<<<< HEAD
                     if 'fellowPlayers' in game.keys(): 
                         for player in game['fellowPlayers']:
                             summsToCheck.append(player['summonerId'])
+=======
+                    print('game keys are:',game.keys())
+                    for player in game['fellowPlayers']:
+                        summsToCheck.append(player['summonerId'])
+>>>>>>> fix-str-type-not-float
             y+=1
         
             
