@@ -43,7 +43,7 @@ GAME_MODES = {
     'poro_king':GameMode('KINGPORO','KING_PORO'),
     'blood_moon':GameMode('ASSASSINATE','ASSASSINATE'),
     'urf':GameMode('URF','URF'),
-    'nexus_seige':GameMode('SEIGE','SEIGE'),
+    'nexus_seige':GameMode('SIEGE','SIEGE'),
     'definitely_not_dominion':GameMode('ODIN','ODIN_UNRANKED'),
     'snowdown_showdown':GameMode('FIRSTBLOOD','FIRSTBLOOD_1x1')    
     }

@@ -173,7 +173,11 @@ class WinCollector:
         while y < len(summsToCheck):
             history=self.api.get_game_history(summsToCheck[y])
             for game in history['games']:
-                print('game is:',game)
+                #print('game is:',game)
+                if game['gameMode'] == 'SIEGE':
+                    print('mode.gameMode is:',mode.gameMode,'game[subType] is:',game['subType'],'mode.subType is:',mode.subType,)
+                else:
+                    print('game[\'gameMode\'] is:',game['gameMode'])
                 if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'], 'games', insertOrNot=False):
                     return summsToCheck[y]
                 else:
