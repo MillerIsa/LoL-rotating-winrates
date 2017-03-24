@@ -8,7 +8,7 @@ from sheets import PrintToReddit
 import passkey
 import consts
 from windatasort.win_collector import WinCollector
-def main(rootSumm='mantia',gameMode='ascension'):
+def main(rootSumm='mantia',gameMode='nexus_seige'):
     #PrintToReddit().updateTable2()
     api=initialize()   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)

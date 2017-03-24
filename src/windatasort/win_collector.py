@@ -168,7 +168,6 @@ class WinCollector:
     #@param mode is the desired mode to pull games on
     #@return game Id of the new game to spider from
     def seedSumm(self,rootSumm,mode):
-        gamesToCheck=[]
         summsToCheck=[rootSumm]
         y=0
         while y < len(summsToCheck):
@@ -178,8 +177,9 @@ class WinCollector:
                 if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'], 'games', insertOrNot=False):
                     return summsToCheck[y]
                 else:
-                    for player in game['fellowPlayers']:
-                        summsToCheck.append(player['summonerId'])
+                    if 'fellowPlayers' in game.keys(): 
+                        for player in game['fellowPlayers']:
+                            summsToCheck.append(player['summonerId'])
             y+=1
         
             
