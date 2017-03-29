@@ -5,11 +5,13 @@ Created on Feb 17, 2017
 '''
 from riot_api import RiotAPI 
 from sheets import PrintToReddit
+from sheets import FormatSheets
 import passkey
 import consts
 from windatasort.win_collector import WinCollector
 def main(rootSumm='mantia',gameMode='nexus_seige'):
     #PrintToReddit().updateTable2()
+    FormatSheets().format()
     api=initialize()   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
     #36179556

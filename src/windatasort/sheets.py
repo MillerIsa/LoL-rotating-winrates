@@ -53,17 +53,101 @@ def get_credentials():
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
-
+class FormatSheets:
+    def __init__(self):
+        pass
+    #ranges format:
+    #ranges:['range':{'start_row_index': 0,
+    #        'end_row_index': 1,
+    #        'start_column_index': 0,
+    #        'end_column_index': 150
+    #                    }
+    #position in list corresponds to sheet id
+    #]
+    
+    #returns an object mimicing the order of the requested ranges
+    def parseSheetHeaders(self,spreadsheatId,ranges):
+        "returns a list of spreadsheet data from the first row of each sheet in the given spreadsheat"
+        credentials = get_credentials()
+        http = credentials.authorize(httplib2.Http())
+        discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
+                        'version=v4')
+        service = discovery.build('sheets', 'v4', http=http,
+                                  discoveryServiceUrl=discoveryUrl)
+        returnCells=[]
+        range:{
+        'sheet_id': 0,
+        'start_row_index': 0,
+        'end_row_index': 1,
+        'start_column_index': 0,
+        'end_column_index': 1
+                       }
+        x=0
+        for range in ranges:
+            print('range is:',range)
+            range['sheet_id']=x
+            #rangeForm={
+            #        'range':{
+            #           'sheet_id': x,
+            #           'start_row_index':range['start_row_index'],
+            #           'end_row_index':range['end_row_index'],
+            #           'start_column_index':range['start_column_index'],
+            #           
+            #           'end_column_index': 150
+            #                    }
+            #           }
+            sheetX=service.spreadsheets().get(spreadsheetId=spreadsheatId, ranges=range, includeGridData=None)
+            cells={}
+            try:
+                print('trying to initiate request to sheets')
+                cells=sheetX.execute()
+            except:print('sheet data retrieval failed')
+            returnCells.append(cells)
+                
+            x+=1
+        print('returnCells is:',returnCells)    
+        return returnCells
+    def format(self,spreadsheetId='13xtXU-4gAEzlMb0uvmfzMENsmbmtLRA9kXeeZnPSl4I'):
+        credentials = get_credentials()
+        http = credentials.authorize(httplib2.Http())
+        discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
+                        'version=v4')
+        service = discovery.build('sheets', 'v4', http=http,
+                                  discoveryServiceUrl=discoveryUrl)
+        ranges=[{
+            'start_row_index': 0,
+            'end_row_index': 1,
+            'start_column_index': 0,
+            'end_column_index': 6
+            }
+            ]
+        x=0
+        while x < 4:
+            range={
+                'start_row_index': 0,
+                'end_row_index': 1,
+                'start_column_index': 0,
+                'end_column_index': 150
+                }
+            ranges.append(range)
+            x+=1
+        cells=self.parseSheetHeaders(spreadsheatId=spreadsheetId, ranges=ranges)
+        print('cells are:',cells)
+        bodyForm={"includeSpreadsheetInResponse": True,
+               "responseIncludeGridData":True,
+               "requests": {
+                   }
+    }
+        #resultformat=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=bodyForm)
+        resultGet=service.spreadsheets().get(spreadsheetId=spreadsheetId, ranges='A1:A10', includeGridData=True)
+       # resultformat.execute()
+        print('getResult is:',resultGet.execute())
+        #except:print('failed to format sheet')
+   
 class PrintToSheets:
     def __init__(self,stater):
         self.stater=stater
     def sheetUpdate(self):
-        """Shows basic usage of the Sheets API.
-    
-        Creates a Sheets API service object and prints the names and majors of
-        students in a sample spreadsheet:
-        https://docs.google.com/spreadsheets/d/1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8/edit
-        """
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
