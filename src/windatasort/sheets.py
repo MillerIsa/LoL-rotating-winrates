@@ -1,6 +1,7 @@
 from __future__ import print_function
 import httplib2
 import os
+import copy
 
 from stat_calc import StatCalc
 
@@ -150,8 +151,8 @@ class FormatSheets:
                                                                 'green':1,
                                                                 'red':0
                                                             },
-                                                        'type':'Percent',
-                                                        'value':'100'
+                                                        'type':'Number',
+                                                        'value':'1'
                                                     },
                                                 'midpoint':{
                                                         'color':{
@@ -160,8 +161,8 @@ class FormatSheets:
                                                                 'green':1,
                                                                 'alpha':1
                                                             },
-                                                            'type':'Percent',
-                                                            'value':'50'                                                           
+                                                            'type':'Number',
+                                                            'value':'.5'                                                           
                                                     },
                                                 'minpoint':{
                                                         'color':{
@@ -170,7 +171,7 @@ class FormatSheets:
                                                                 'green':0,
                                                                 'alpha':1
                                                             },
-                                                            'type':'Percent',
+                                                            'type':'Number',
                                                             'value':'0'                                                            
                                                     },
                                             }
@@ -179,7 +180,7 @@ class FormatSheets:
                             }
                    }]
 }
-        sheet1Format=winRateFormat.copy()
+        sheet1Format=copy.deepcopy(winRateFormat)
         sheet1Format['requests'][0]['addConditionalFormatRule']['rule'].update({
                                             'ranges':
                                             [{
@@ -191,7 +192,7 @@ class FormatSheets:
                                             }]
                                                                                        })
         
-        pairingsFormat=winRateFormat.copy()
+        pairingsFormat=copy.deepcopy(winRateFormat)
         pairingsFormat['requests'][0]['addConditionalFormatRule']['rule'].update({
                                             'ranges':
                                             [{
@@ -202,7 +203,7 @@ class FormatSheets:
                                                 'end_column_index': 1000
                                             }]
                                                                                        })
-        opponentsFormat=winRateFormat.copy()
+        opponentsFormat=copy.deepcopy(winRateFormat)
         opponentsFormat['requests'][0]['addConditionalFormatRule']['rule'].update({
                                             'ranges':
                                             [{
@@ -265,14 +266,21 @@ class FormatSheets:
                             }
                    }]
     }
+        
+        print('sheet1Format range is:',sheet1Format['requests'][0]['addConditionalFormatRule']['rule']['ranges'])
+        print('pairingsFormat range is:',pairingsFormat['requests'][0]['addConditionalFormatRule']['rule']['ranges'])
+        print('opponentsFormat range is:',opponentsFormat['requests'][0]['addConditionalFormatRule']['rule']['ranges'])
         resultSheet1=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=sheet1Format)
         resultPairings=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=pairingsFormat)
         resultOpponents=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=opponentsFormat)
         
         #resultGet=service.spreadsheets().get(spreadsheetId=spreadsheetId, ranges='A1:A10', includeGridData=True)
         resultSheet1.execute()
+        print('executed resultSheet1')
         resultPairings.execute()
+        print('executed resultPairings')
         resultOpponents.execute()
+        print('executed resultOpponents')
         #print('getResult is:',resultGet.execute())
         #except:print('failed to format sheet')
    
@@ -441,7 +449,7 @@ class PrintToReddit:
         self.service = discovery.build('sheets', 'v4', http=http,
                                   discoveryServiceUrl=discoveryUrl)
 
-    def updateTable2(self,spreadsheatId="1Sr_xuN1Kv3xexn8uU3hjm3goMZ7GbnDuzUgVWFrDNzA",subSheetName="Ascension-3/15/2017",cellRange='A1:F135',filename="redditAscension3-14-2017.txt"):
+    def updateTable2(self,spreadsheatId="181F2u2xcFSuML4KxQKBz3pcCoaSCNdYDyP8VCDHzhr0",subSheetName="winRates",cellRange='A1:F135',filename="redditSeige3-24_28-2017.txt"):
         
         
         request=self.service.spreadsheets().values().get(spreadsheetId=spreadsheatId, range=subSheetName.join([cellRange]), majorDimension=None, dateTimeRenderOption=None, valueRenderOption=None, x__xgafv=None)
@@ -449,7 +457,7 @@ class PrintToReddit:
         print('result is:',result)
         
         
-        filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\redditAscension3-17_18-2017.txt'
+        filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\redditSeige3-24_28-2017.txt'
         
         #unpacks the data from google sheets into the table format for reddit
         file = open(filePath,'w')
