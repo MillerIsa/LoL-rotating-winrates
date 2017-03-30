@@ -98,16 +98,16 @@ class FormatSheets:
             #           }
             sheetX=service.spreadsheets().get(spreadsheetId=spreadsheatId, ranges=range, includeGridData=None)
             cells={}
-            try:
-                print('trying to initiate request to sheets')
-                cells=sheetX.execute()
-            except:print('sheet data retrieval failed')
+            #try:
+            print('trying to initiate request to sheets')
+            cells=sheetX.execute()
+            #except:print('sheet data retrieval failed')
             returnCells.append(cells)
                 
             x+=1
         print('returnCells is:',returnCells)    
         return returnCells
-    def format(self,spreadsheetId='13xtXU-4gAEzlMb0uvmfzMENsmbmtLRA9kXeeZnPSl4I'):
+    def format(self,spreadsheetId='181F2u2xcFSuML4KxQKBz3pcCoaSCNdYDyP8VCDHzhr0'):
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
@@ -131,17 +131,63 @@ class FormatSheets:
                 }
             ranges.append(range)
             x+=1
-        cells=self.parseSheetHeaders(spreadsheatId=spreadsheetId, ranges=ranges)
-        print('cells are:',cells)
-        bodyForm={"includeSpreadsheetInResponse": True,
-               "responseIncludeGridData":True,
-               "requests": {
-                   }
+        #cells=self.parseSheetHeaders(spreadsheatId=spreadsheetId, ranges=ranges)
+        #print('cells are:',cells)
+        
+        bodyForm={"includeSpreadsheetInResponse": False,
+               "responseIncludeGridData":False,
+               "requests": [{
+                        "addConditionalFormatRule":{
+                                'index':0,
+                                'rule':{
+                                        'ranges':[{
+                                                'sheet_id': 0,
+                                                'start_row_index': 0,
+                                                'end_row_index': 1000,
+                                                'start_column_index': 1,
+                                                'end_column_index': 2
+                                            }],
+                                        'gradientRule':{
+                                                'maxpoint':{
+                                                        'color':{
+                                                                'blue':0,
+                                                                'alpha':1,
+                                                                'green':1,
+                                                                'red':0
+                                                            },
+                                                        'type':'Percent',
+                                                        'value':'100'
+                                                    },
+                                                'midpoint':{
+                                                        'color':{
+                                                                'red':1,
+                                                                'blue':1,
+                                                                'green':1,
+                                                                'alpha':1
+                                                            },
+                                                            'type':'Percent',
+                                                            'value':'50'                                                           
+                                                    },
+                                                'minpoint':{
+                                                        'color':{
+                                                                'red':1,
+                                                                'blue':0,
+                                                                'green':0,
+                                                                'alpha':1
+                                                            },
+                                                            'type':'Percent',
+                                                            'value':'0'                                                            
+                                                    },
+                                            }
+        
+                                    }
+                            }
+                   }]
     }
-        #resultformat=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=bodyForm)
-        resultGet=service.spreadsheets().get(spreadsheetId=spreadsheetId, ranges='A1:A10', includeGridData=True)
-       # resultformat.execute()
-        print('getResult is:',resultGet.execute())
+        resultformat=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=bodyForm)
+        #resultGet=service.spreadsheets().get(spreadsheetId=spreadsheetId, ranges='A1:A10', includeGridData=True)
+        resultformat.execute()
+        #print('getResult is:',resultGet.execute())
         #except:print('failed to format sheet')
    
 class PrintToSheets:
