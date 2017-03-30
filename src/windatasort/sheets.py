@@ -134,19 +134,14 @@ class FormatSheets:
         #cells=self.parseSheetHeaders(spreadsheatId=spreadsheetId, ranges=ranges)
         #print('cells are:',cells)
         
-        bodyForm={"includeSpreadsheetInResponse": False,
+        #winRateFormat, after adding the range information, is a dictionary that tells google sheets to format the win rates in my preffered style
+        winRateFormat={
+            "includeSpreadsheetInResponse": False,
                "responseIncludeGridData":False,
                "requests": [{
                         "addConditionalFormatRule":{
                                 'index':0,
                                 'rule':{
-                                        'ranges':[{
-                                                'sheet_id': 0,
-                                                'start_row_index': 0,
-                                                'end_row_index': 1000,
-                                                'start_column_index': 1,
-                                                'end_column_index': 2
-                                            }],
                                         'gradientRule':{
                                                 'maxpoint':{
                                                         'color':{
@@ -183,10 +178,101 @@ class FormatSheets:
                                     }
                             }
                    }]
+}
+        sheet1Format=winRateFormat.copy()
+        sheet1Format['requests'][0]['addConditionalFormatRule']['rule'].update({
+                                            'ranges':
+                                            [{
+                                                'sheet_id': 0,
+                                                'start_row_index': 0,
+                                                'end_row_index': 1000,
+                                                'start_column_index': 1,
+                                                'end_column_index': 3
+                                            }]
+                                                                                       })
+        
+        pairingsFormat=winRateFormat.copy()
+        pairingsFormat['requests'][0]['addConditionalFormatRule']['rule'].update({
+                                            'ranges':
+                                            [{
+                                                'sheet_id': 516289757,
+                                                'start_row_index': 0,
+                                                'end_row_index': 1000,
+                                                'start_column_index': 1,
+                                                'end_column_index': 1000
+                                            }]
+                                                                                       })
+        opponentsFormat=winRateFormat.copy()
+        opponentsFormat['requests'][0]['addConditionalFormatRule']['rule'].update({
+                                            'ranges':
+                                            [{
+                                                'sheet_id': 204805531,
+                                                'start_row_index': 0,
+                                                'end_row_index': 1000,
+                                                'start_column_index': 1,
+                                                'end_column_index': 1000
+                                            }]
+                                            
+                                                                                        })
+        
+        bodyForm={"includeSpreadsheetInResponse": False,
+               "responseIncludeGridData":False,
+               "requests": [{
+                        "addConditionalFormatRule":{
+                                'index':0,
+                                'rule':{
+                                        'ranges':[{
+                                                'sheet_id': 0,
+                                                'start_row_index': 0,
+                                                'end_row_index': 1000,
+                                                'start_column_index': 1,
+                                                'end_column_index': 3
+                                            }],
+                                        'gradientRule':{
+                                                'maxpoint':{
+                                                        'color':{
+                                                                'blue':0,
+                                                                'alpha':1,
+                                                                'green':1,
+                                                                'red':0
+                                                            },
+                                                        'type':'Number',
+                                                        'value':'1'
+                                                    },
+                                                'midpoint':{
+                                                        'color':{
+                                                                'red':1,
+                                                                'blue':1,
+                                                                'green':1,
+                                                                'alpha':1
+                                                            },
+                                                            'type':'Number',
+                                                            'value':'.5'                                                           
+                                                    },
+                                                'minpoint':{
+                                                        'color':{
+                                                                'red':1,
+                                                                'blue':0,
+                                                                'green':0,
+                                                                'alpha':1
+                                                            },
+                                                            'type':'Number',
+                                                            'value':'0'                                                            
+                                                    },
+                                            }
+        
+                                    }
+                            }
+                   }]
     }
-        resultformat=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=bodyForm)
+        resultSheet1=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=sheet1Format)
+        resultPairings=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=pairingsFormat)
+        resultOpponents=service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=opponentsFormat)
+        
         #resultGet=service.spreadsheets().get(spreadsheetId=spreadsheetId, ranges='A1:A10', includeGridData=True)
-        resultformat.execute()
+        resultSheet1.execute()
+        resultPairings.execute()
+        resultOpponents.execute()
         #print('getResult is:',resultGet.execute())
         #except:print('failed to format sheet')
    
