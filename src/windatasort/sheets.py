@@ -68,7 +68,7 @@ class FormatSheets:
     
     #returns an object mimicing the order of the requested ranges
     def parseSheetHeaders(self,spreadsheatId,ranges):
-        "returns a list of spreadsheet data from the first row of each sheet in the given spreadsheat"
+        "returns a list of spreadsheet data from the first row of each sheet in the given spreadsheet"
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'

@@ -10,9 +10,10 @@ import passkey
 import consts
 from windatasort.win_collector import WinCollector
 def main(rootSumm='mantia',gameMode='nexus_seige'):
-    PrintToReddit().updateTable2()
-    FormatSheets().format()
-    api=initialize()   
+    #PrintToReddit().updateTable2()
+    #FormatSheets().format()
+    api=initialize()
+    print('champ names are:',api.champ_names_builder())   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
     #36179556
     #print('returned:',api.get_summoner_by_name('mantia'))
@@ -21,9 +22,9 @@ def main(rootSumm='mantia',gameMode='nexus_seige'):
     #print ('rootSummId is:',rootSummId)
     #print (r) 
     winning=WinCollector(api)
-    #goodRoot=winning.seedSumm(rootSummId,consts.GAME_MODES[gameMode])
+    goodRoot=winning.seedSumm(rootSummId,consts.GAME_MODES[gameMode])
     #print('good root is:',goodRoot)
-    #winning.spider(goodRoot, consts.GAME_MODES[gameMode])
+    winning.spider(goodRoot, consts.GAME_MODES[gameMode])
     print('times rate limit was exceeded:',api.timesLimExceeded)
     #winning.examineGameHistory(60683268,consts.GAME_MODES['poro_king'])
     #print (winning.winDict)

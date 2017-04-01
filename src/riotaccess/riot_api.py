@@ -202,8 +202,16 @@ class RiotAPI(object):
         chmpDict={}
         tempDict=self.get_champion_list()
         if type(tempDict) != dict:print('error retriving chmpNames:',tempDict)
-        for name in tempDict['data']:
-            chmpDict[tempDict['data'][name]['id']]=name
+        else:
+            #switch MonkeyKing to the common name Wukong
+            #print('changing MonkeyKing name')
+            #print(list(tempDict.keys()))
+            #print('temp Dict at data is:',tempDict['data'])
+            #tempDict['data'][MonkeyKing]['name']='Wukong'
+            
+            for name in tempDict['data']:
+                chmpDict[tempDict['data'][name]['id']]=tempDict['data'][name]['name']
+                #chmpDict[tempDict['data'][name]['id']]=name
         return chmpDict
     
 

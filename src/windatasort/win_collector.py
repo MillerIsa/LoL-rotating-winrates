@@ -130,7 +130,7 @@ class WinCollector:
                                 
     #@param rootPlayer is the summoner id of the player to start spidering from
     #@param string representing game mode    
-    def spider(self,rootPlayer,gameMode):
+    def spider(self,rootPlayer,gameMode,gameBuffer=50):
         'pulls game data for statistical analysis and stores the portions of the data in winDict' 
       
         summsToPull=[rootPlayer]
@@ -154,7 +154,7 @@ class WinCollector:
                 #time.sleep(.001)
                 #print('summsToPull is:',summsToPull)
             #performs statistic calculations when the number of games aggregated exceeds the number of recorded games by the indicated amount
-            if len(self.lists['games']) - self.statedGames > 500:
+            if len(self.lists['games']) - self.statedGames > gameBuffer:
                 print('total games collected:',self.winDict['totalGames'])
                 self.stater.calcAll()
                 self.printer.sheetUpdate()
