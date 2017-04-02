@@ -28,13 +28,14 @@ def gridToDict(grid):
     retDict={}
     x=1
     while x < len(grid):
-        y=0
+        y=1
         retDict[grid[x][0]]={}
         while (y < len(grid[x])):
             #
             retDict[grid[x][0]][grid[0][y]]=[grid[x][y]]
             y+=1
         x+=1
+    return retDict
 def get_credentials():
     """Gets valid user credentials from storage.
 
@@ -325,7 +326,7 @@ class PrintToSheets:
             chmpEntry2=self.stater.rawWins['champions'][chmpId]
             valueArray.append([chmpEntry['chmpName'],chmpEntry['winRate'],chmpEntry['adjWinRate'],chmpEntry['mirrorMatches'],chmpEntry['popularity'],chmpEntry2['totalGames']])
             x+=1
-        z=0
+
         
         print ('valueArray is:', valueArray)
         
