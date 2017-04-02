@@ -29,6 +29,7 @@ def gridToDict(grid):
     x=1
     while x < len(grid):
         y=1
+        #if grid[x][0]
         retDict[grid[x][0]]={}
         while (y < len(grid[x])):
             #
@@ -36,6 +37,21 @@ def gridToDict(grid):
             y+=1
         x+=1
     return retDict
+#for key in pairingGrid.keys():
+#            print('key is:',key)
+#            if type(pairingGrid[key])==dict:
+#                for _key in pairingGrid[key].keys():
+#                    print('    key is:',_key)
+def recursDictKeys(dict):
+    """returns a nested list the keys at each level of the dictionary
+     excluding keys that have non-dictionary ancestors.
+     each sub list represents the keys in a different tier"""
+    for key in pairingGrid.keys():
+            print('key is:',key)
+            if type(pairingGrid[key])==dict:
+                for _key in pairingGrid[key].keys():
+                    print('    key is:',_key)
+    
 def get_credentials():
     """Gets valid user credentials from storage.
 
@@ -197,7 +213,13 @@ class FormatSheets:
             
             
             }
-        gridToDict()
+        
+        
+        pairingGridReq=service.spreadsheets().get(spreadsheetId=spreadsheetId,ranges='pairings!A1:EZ150')
+        pairingGrid=pairingGridReq.execute()
+        recursDictKeys()
+        print('blank cell type is:',type(pairingGrid[0][150]),'blank cell value is',pairingGrid[0][150])
+        pairingDict=gridToDict()
         
         sheet1Format=copy.deepcopy(winRateFormat)
         sheet1Format['requests'][0]['addConditionalFormatRule']['rule'].update({
