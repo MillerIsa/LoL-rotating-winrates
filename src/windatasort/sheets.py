@@ -22,7 +22,19 @@ SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 CLIENT_SECRET_FILE=os.path.join(os.path.expanduser('~'), 'Documents\Liclipse Workspace\LeagueWinRates\src\windatasort\client_secret.json')
 APPLICATION_NAME = 'LoL Stat Updater'
 
-
+def gridToDict(grid):
+    """takes a square nested list and converts it into a dictionary.
+    The first list and the first element of each subsequent list are used as the dictionaries keys."""
+    retDict={}
+    x=1
+    while x < len(grid):
+        y=0
+        retDict[grid[x][0]]={}
+        while (y < len(grid[x])):
+            #
+            retDict[grid[x][0]][grid[0][y]]=[grid[x][y]]
+            y+=1
+        x+=1
 def get_credentials():
     """Gets valid user credentials from storage.
 
@@ -180,6 +192,12 @@ class FormatSheets:
                             }
                    }]
 }
+        pairsAndOppsForm={
+            
+            
+            }
+        gridToDict()
+        
         sheet1Format=copy.deepcopy(winRateFormat)
         sheet1Format['requests'][0]['addConditionalFormatRule']['rule'].update({
                                             'ranges':
@@ -284,6 +302,7 @@ class FormatSheets:
         #print('getResult is:',resultGet.execute())
         #except:print('failed to format sheet')
    
+    
 class PrintToSheets:
     def __init__(self,stater):
         self.stater=stater
