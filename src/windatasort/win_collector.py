@@ -135,7 +135,7 @@ class WinCollector:
       
         summsToPull=[rootPlayer]
         #pulls the win/loss data for an individual's game history
-        for summ in self.examineGameHistory(rootPlayer,gameMode):
+        for summ in self.examineGameHistory(rootPlayer,gameMode,gameBuffer=500):
             summsToPull.append(summ)
         x=0
         for summ in summsToPull:
