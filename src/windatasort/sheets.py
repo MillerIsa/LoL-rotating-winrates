@@ -327,7 +327,7 @@ class FormatSheets:
    
     
 class PrintToSheets:
-    def __init__(self,stater):
+    def __init__(self,stater,spreadsheetId = '1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8'):
         self.stater=stater
     def sheetUpdate(self):
         credentials = get_credentials()
@@ -337,7 +337,7 @@ class PrintToSheets:
         service = discovery.build('sheets', 'v4', http=http,
                                   discoveryServiceUrl=discoveryUrl)
     
-        spreadsheetId = '13xtXU-4gAEzlMb0uvmfzMENsmbmtLRA9kXeeZnPSl4I'
+        
         #rangeName = 'Class Data!A2:E'
         #updates values in spreadsheet
         rawWins=self.stater.calcAll()

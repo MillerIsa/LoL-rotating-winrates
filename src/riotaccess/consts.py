@@ -45,9 +45,16 @@ GAME_MODES = {
     'urf':GameMode('URF','URF'),
     'nexus_seige':GameMode('SIEGE','SIEGE'),
     'definitely_not_dominion':GameMode('ODIN','ODIN_UNRANKED'),
-    'snowdown_showdown':GameMode('FIRSTBLOOD','FIRSTBLOOD_1x1')    
+    'snowdown_showdown':GameMode('FIRSTBLOOD','FIRSTBLOOD_1x1'),
+    'arsr':GameMode('ARSR','ARSR')    
     }
 
+MAPS = {
+    12:'Howling_Abyss',
+    11:'Summoners_Rift',
+    10:'Twisted_Treeline',
+    8:'Ascension_Map'
+    }
 RESPONSE_CODES = {
     400:'Bad request',
     401:'Unauthorized',
