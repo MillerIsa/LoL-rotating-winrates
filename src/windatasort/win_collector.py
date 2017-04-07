@@ -130,12 +130,12 @@ class WinCollector:
                                 
     #@param rootPlayer is the summoner id of the player to start spidering from
     #@param string representing game mode    
-    def spider(self,rootPlayer,gameMode):
+    def spider(self,rootPlayer,gameMode,gameBuffer=500):
         'pulls game data for statistical analysis and stores the portions of the data in winDict' 
       
         summsToPull=[rootPlayer]
         #pulls the win/loss data for an individual's game history
-        for summ in self.examineGameHistory(rootPlayer,gameMode,gameBuffer=500):
+        for summ in self.examineGameHistory(rootPlayer,gameMode):
             summsToPull.append(summ)
         x=0
         for summ in summsToPull:

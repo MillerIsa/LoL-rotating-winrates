@@ -327,9 +327,9 @@ class FormatSheets:
    
     
 class PrintToSheets:
-    def __init__(self,stater,spreadsheetId = '1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8'):
+    def __init__(self,stater):
         self.stater=stater
-    def sheetUpdate(self):
+    def sheetUpdate(self,spreadsheetId='1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8'):
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
