@@ -130,7 +130,11 @@ class WinCollector:
                                 
     #@param rootPlayer is the summoner id of the player to start spidering from
     #@param string representing game mode    
+<<<<<<< HEAD
     def spider(self,rootPlayer,gameMode,gameBuffer=50):
+=======
+    def spider(self,rootPlayer,gameMode,gameBuffer=500):
+>>>>>>> reddit-dynamically-make-file
         'pulls game data for statistical analysis and stores the portions of the data in winDict' 
       
         summsToPull=[rootPlayer]
@@ -157,13 +161,29 @@ class WinCollector:
             if len(self.lists['games']) - self.statedGames > gameBuffer:
                 print('total games collected:',self.winDict['totalGames'])
                 self.stater.calcAll()
-                self.printer.sheetUpdate()
+                self.printer.sheetUpdate();
                 #self.stater.printCalcs()
                 self.statedGames=len(self.lists['games'])
         #for summId in summsToPull:
             #self.spider(summId,gameMode)
             
-        
+    def spiderAll(self,rootPlayer):    
+        """use to sort through different player histories for all game modes without recording game statistics"""
+        summsToPull=[rootPlayer]
+        for summonerId in summsToPull:
+            history=self.api.get_game_history(summonerId)
+            games=history['games']
+            for game in games:
+                if((game['gameMode'] == 'CLASSIC' or game['subType'] == 'ARAM_UNRANKED_5x5') and game['mapId'] == 11):
+                    print('game mode is:',game['gameMode'],'game subType is:',game['subType'],"mapId is:",game['mapId'])
+                    print('map name is:',consts.MAPS[game['mapId']])
+                
+                try:
+                    for player in game['fellowPlayers']:
+                        if self.addId2(player['summonerId'],'summoners'):
+                                summsToPull.append(player['summonerId'])
+                except KeyError:print('keyError occurred when calling game[\'fellowPlayers\']')
+                
     #@param mode is a GameMode object used to filter examined games down to the desired game mode using mode type and subtype (not yet implimented)
     #@param mode is the desired mode to pull games on
     #@return game Id of the new game to spider from
@@ -175,21 +195,23 @@ class WinCollector:
             for game in history['games']:
                 #print('game is:',game)
                 if game['gameMode'] == 'SIEGE':
-                    print('mode.gameMode is:',mode.gameMode,'game[subType] is:',game['subType'],'mode.subType is:',mode.subType,)
+                    print('mode.gameMode is:',mode.gameMode,'game[subType] is:',game['subType'],'mode.subType is:',mode.subType)
                 else:
                     print('game[\'gameMode\'] is:',game['gameMode'])
                 if game['gameMode'] == mode.gameMode and game['subType'] == mode.subType and self.addId2(game['gameId'], 'games', insertOrNot=False):
                     return summsToCheck[y]
                 else:
 
-                    if 'fellowPlayers' in game.keys(): 
-                        for player in game['fellowPlayers']:
-                            summsToCheck.append(player['summonerId'])
+                    if 'fellowPlayers' in game.keys():
+                        try: 
+                            for player in game['fellowPlayers']:
+                                summsToCheck.append(player['summonerId'])
+                        except:pass
             y+=1
         
             
         
-        
+       
         
         #api.get_game_history(keyPlayerId)['games'][0]['fellowPlayers'][0]
     #adds a game id to the list if it is not already listed, returns False if there is already a listing for that id else adds an id and returns true.

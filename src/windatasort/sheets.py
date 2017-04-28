@@ -22,7 +22,36 @@ SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 CLIENT_SECRET_FILE=os.path.join(os.path.expanduser('~'), 'Documents\Liclipse Workspace\LeagueWinRates\src\windatasort\client_secret.json')
 APPLICATION_NAME = 'LoL Stat Updater'
 
-
+def gridToDict(grid):
+    """takes a square nested list and converts it into a dictionary.
+    The first list and the first element of each subsequent list are used as the dictionaries keys."""
+    retDict={}
+    x=1
+    while x < len(grid):
+        y=1
+        #if grid[x][0]
+        retDict[grid[x][0]]={}
+        while (y < len(grid[x])):
+            #
+            retDict[grid[x][0]][grid[0][y]]=[grid[x][y]]
+            y+=1
+        x+=1
+    return retDict
+#for key in pairingGrid.keys():
+#            print('key is:',key)
+#            if type(pairingGrid[key])==dict:
+#                for _key in pairingGrid[key].keys():
+#                    print('    key is:',_key)
+def recursDictKeys(dict):
+    """returns a nested list the keys at each level of the dictionary
+     excluding keys that have non-dictionary ancestors.
+     each sub list represents the keys in a different tier"""
+    for key in pairingGrid.keys():
+            print('key is:',key)
+            if type(pairingGrid[key])==dict:
+                for _key in pairingGrid[key].keys():
+                    print('    key is:',_key)
+    
 def get_credentials():
     """Gets valid user credentials from storage.
 
@@ -54,6 +83,7 @@ def get_credentials():
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
+#Note: it is easier to create one template and copy it than to use format sheets at the moment
 class FormatSheets:
     def __init__(self):
         pass
@@ -108,7 +138,8 @@ class FormatSheets:
             x+=1
         print('returnCells is:',returnCells)    
         return returnCells
-    def format(self,spreadsheetId='181F2u2xcFSuML4KxQKBz3pcCoaSCNdYDyP8VCDHzhr0'):
+    
+    def format(self,spreadsheetId='1bFHpt9MKE-KAoc5r6uttbj497ZdZ5kUCqYZ4x6c936E'):
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
@@ -180,6 +211,18 @@ class FormatSheets:
                             }
                    }]
 }
+        pairsAndOppsForm={
+            
+            
+            }
+        
+        
+        pairingGridReq=service.spreadsheets().get(spreadsheetId=spreadsheetId,ranges='pairings!A1:EZ150')
+        pairingGrid=pairingGridReq.execute()
+        #recursDictKeys()
+        #print('blank cell type is:',type(pairingGrid[0][150]),'blank cell value is',pairingGrid[0][150])
+        #pairingDict=gridToDict()
+        
         sheet1Format=copy.deepcopy(winRateFormat)
         sheet1Format['requests'][0]['addConditionalFormatRule']['rule'].update({
                                             'ranges':
@@ -284,10 +327,11 @@ class FormatSheets:
         #print('getResult is:',resultGet.execute())
         #except:print('failed to format sheet')
    
+    
 class PrintToSheets:
     def __init__(self,stater):
         self.stater=stater
-    def sheetUpdate(self):
+    def sheetUpdate(self,spreadsheetId='1bFHpt9MKE-KAoc5r6uttbj497ZdZ5kUCqYZ4x6c936E'):
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
@@ -295,7 +339,7 @@ class PrintToSheets:
         service = discovery.build('sheets', 'v4', http=http,
                                   discoveryServiceUrl=discoveryUrl)
     
-        spreadsheetId = '13xtXU-4gAEzlMb0uvmfzMENsmbmtLRA9kXeeZnPSl4I'
+        
         #rangeName = 'Class Data!A2:E'
         #updates values in spreadsheet
         rawWins=self.stater.calcAll()
@@ -306,7 +350,7 @@ class PrintToSheets:
             chmpEntry2=self.stater.rawWins['champions'][chmpId]
             valueArray.append([chmpEntry['chmpName'],chmpEntry['winRate'],chmpEntry['adjWinRate'],chmpEntry['mirrorMatches'],chmpEntry['popularity'],chmpEntry2['totalGames']])
             x+=1
-        z=0
+
         
         print ('valueArray is:', valueArray)
         
@@ -449,7 +493,7 @@ class PrintToReddit:
         self.service = discovery.build('sheets', 'v4', http=http,
                                   discoveryServiceUrl=discoveryUrl)
 
-    def updateTable2(self,spreadsheatId="181F2u2xcFSuML4KxQKBz3pcCoaSCNdYDyP8VCDHzhr0",subSheetName="winRates",cellRange='A1:F135',filename="redditSeige3-24_28-2017.txt"):
+    def updateTable2(self,spreadsheatId="1bFHpt9MKE-KAoc5r6uttbj497ZdZ5kUCqYZ4x6c936E",subSheetName="winRates",cellRange='A1:F135',filename="redditSeige3-24_28-2017.txt"):
         
         
         request=self.service.spreadsheets().values().get(spreadsheetId=spreadsheatId, range=subSheetName.join([cellRange]), majorDimension=None, dateTimeRenderOption=None, valueRenderOption=None, x__xgafv=None)
@@ -457,10 +501,10 @@ class PrintToReddit:
         print('result is:',result)
         
         
-        filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\redditSeige3-24_28-2017.txt'
+        filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\' + filename
         
         #unpacks the data from google sheets into the table format for reddit
-        file = open(filePath,'w')
+        file = open(filePath,'w+')
         file.write('|'.join(result['values'][0]))
         z=1
         alignmentStr=':--'
