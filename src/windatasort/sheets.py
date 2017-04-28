@@ -504,7 +504,7 @@ class PrintToReddit:
         filePath='C:\\Users\\Brian-VAIO\\Documents\\isaiAH_laptop\\computerPrograming\\LoLProject\\LoLWinRateOutput\\redditSeige3-24_28-2017.txt'
         
         #unpacks the data from google sheets into the table format for reddit
-        file = open(filePath,'w')
+        file = open(filePath,'w+')
         file.write('|'.join(result['values'][0]))
         z=1
         alignmentStr=':--'
