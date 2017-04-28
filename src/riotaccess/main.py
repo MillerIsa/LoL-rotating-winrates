@@ -10,17 +10,17 @@ import passkey
 import consts
 from windatasort.win_collector import WinCollector
 def main(rootSumm='mantia',gameMode='poro_king'):
-    PrintToReddit().updateTable2()
+    PrintToReddit().updateTable2(spreadsheatId='1bFHpt9MKE-KAoc5r6uttbj497ZdZ5kUCqYZ4x6c936E', filename='poroKing4-21-28-17.txt')
     #FormatSheets().format()
-    api=initialize()   
+    #api=initialize()   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
     #36179556
     #print('returned:',api.get_summoner_by_name('mantia'))
-    rootSummId=api.get_summoner_by_name(rootSumm)[rootSumm]['id']
-    winning=WinCollector(api)
-    goodRoot=winning.seedSumm(rootSummId,consts.GAME_MODES[gameMode])
+    #rootSummId=api.get_summoner_by_name(rootSumm)[rootSumm]['id']
+    #winning=WinCollector(api)
+    #goodRoot=winning.seedSumm(rootSummId,consts.GAME_MODES[gameMode])
     #print('good root is:',goodRoot)
-    winning.spider(goodRoot, consts.GAME_MODES[gameMode])
+    #winning.spider(goodRoot, consts.GAME_MODES[gameMode])
     #winning.spiderAll(60683268)
     #print('times rate limit was exceeded:',api.timesLimExceeded)
     #winning.examineGameHistory(60683268,consts.GAME_MODES['poro_king'])
