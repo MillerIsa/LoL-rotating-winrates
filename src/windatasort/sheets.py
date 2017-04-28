@@ -83,6 +83,7 @@ def get_credentials():
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
+#Note: it is easier to create one template and copy it than to use format sheets at the moment
 class FormatSheets:
     def __init__(self):
         pass
@@ -137,7 +138,8 @@ class FormatSheets:
             x+=1
         print('returnCells is:',returnCells)    
         return returnCells
-    def format(self,spreadsheetId='181F2u2xcFSuML4KxQKBz3pcCoaSCNdYDyP8VCDHzhr0'):
+    
+    def format(self,spreadsheetId='1bFHpt9MKE-KAoc5r6uttbj497ZdZ5kUCqYZ4x6c936E'):
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
@@ -217,9 +219,9 @@ class FormatSheets:
         
         pairingGridReq=service.spreadsheets().get(spreadsheetId=spreadsheetId,ranges='pairings!A1:EZ150')
         pairingGrid=pairingGridReq.execute()
-        recursDictKeys()
-        print('blank cell type is:',type(pairingGrid[0][150]),'blank cell value is',pairingGrid[0][150])
-        pairingDict=gridToDict()
+        #recursDictKeys()
+        #print('blank cell type is:',type(pairingGrid[0][150]),'blank cell value is',pairingGrid[0][150])
+        #pairingDict=gridToDict()
         
         sheet1Format=copy.deepcopy(winRateFormat)
         sheet1Format['requests'][0]['addConditionalFormatRule']['rule'].update({
@@ -329,7 +331,7 @@ class FormatSheets:
 class PrintToSheets:
     def __init__(self,stater):
         self.stater=stater
-    def sheetUpdate(self,spreadsheetId='1bd2aOQLF0BdYtEcoPJzzc226RD_MJcxsP9VqhowhLh8'):
+    def sheetUpdate(self,spreadsheetId='1bFHpt9MKE-KAoc5r6uttbj497ZdZ5kUCqYZ4x6c936E'):
         credentials = get_credentials()
         http = credentials.authorize(httplib2.Http())
         discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
@@ -491,7 +493,7 @@ class PrintToReddit:
         self.service = discovery.build('sheets', 'v4', http=http,
                                   discoveryServiceUrl=discoveryUrl)
 
-    def updateTable2(self,spreadsheatId="181F2u2xcFSuML4KxQKBz3pcCoaSCNdYDyP8VCDHzhr0",subSheetName="winRates",cellRange='A1:F135',filename="redditSeige3-24_28-2017.txt"):
+    def updateTable2(self,spreadsheatId="1U9uykHNk_0uLDi1RHnASjfld_DWg6rs2NP8FeoDnRf8",subSheetName="winRates",cellRange='A1:F135',filename="redditSeige3-24_28-2017.txt"):
         
         
         request=self.service.spreadsheets().values().get(spreadsheetId=spreadsheatId, range=subSheetName.join([cellRange]), majorDimension=None, dateTimeRenderOption=None, valueRenderOption=None, x__xgafv=None)

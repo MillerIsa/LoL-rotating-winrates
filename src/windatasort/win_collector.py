@@ -157,7 +157,7 @@ class WinCollector:
             if len(self.lists['games']) - self.statedGames > 500:
                 print('total games collected:',self.winDict['totalGames'])
                 self.stater.calcAll()
-                self.printer.sheetUpdate()
+                self.printer.sheetUpdate();
                 #self.stater.printCalcs()
                 self.statedGames=len(self.lists['games'])
         #for summId in summsToPull:

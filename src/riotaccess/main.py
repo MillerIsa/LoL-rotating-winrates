@@ -9,8 +9,8 @@ from sheets import FormatSheets
 import passkey
 import consts
 from windatasort.win_collector import WinCollector
-def main(rootSumm='mantia',gameMode='arsr'):
-    #PrintToReddit().updateTable2()
+def main(rootSumm='mantia',gameMode='poro_king'):
+    PrintToReddit().updateTable2()
     #FormatSheets().format()
     api=initialize()   
     #r=api.get_summoner_by_id(62601084,49330575,20378336)
@@ -26,9 +26,8 @@ def main(rootSumm='mantia',gameMode='arsr'):
     #winning.examineGameHistory(60683268,consts.GAME_MODES['poro_king'])
     #findParticularHist(api)
     
-    #print('Total games collected:',winning.winDict['totalGames'])
-    #print ('winDict is:',winning.winDict)
-    #print('GameIds',winning.lists['games'])
+   
+    
 def findParticularHist(api):
     history=api.get_game_history(59892834)
     games=history['games']
