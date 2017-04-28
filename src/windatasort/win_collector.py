@@ -130,11 +130,9 @@ class WinCollector:
                                 
     #@param rootPlayer is the summoner id of the player to start spidering from
     #@param string representing game mode    
-<<<<<<< HEAD
+
     def spider(self,rootPlayer,gameMode,gameBuffer=50):
-=======
-    def spider(self,rootPlayer,gameMode,gameBuffer=500):
->>>>>>> reddit-dynamically-make-file
+
         'pulls game data for statistical analysis and stores the portions of the data in winDict' 
       
         summsToPull=[rootPlayer]
