@@ -10,7 +10,7 @@ import passkey
 import consts
 from windatasort.win_collector import WinCollector
 
-def main(rootSumm='mantia',gameMode='poro_king'):
+def main(rootSumm='mantia',gameMode='aram'):
     #PrintToReddit().updateTable2(spreadsheatId='1bFHpt9MKE-KAoc5r6uttbj497ZdZ5kUCqYZ4x6c936E', filename='poroKing4-21-28-17.txt')
     #FormatSheets().format()
     api=initialize()   
