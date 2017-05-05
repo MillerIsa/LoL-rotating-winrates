@@ -58,6 +58,7 @@ MAPS = {
 RESPONSE_CODES = {
     400:'Bad request',
     401:'Unauthorized',
+    403:'Forbidden',
     404:'Game data not found',
     429:'Rate limit exceeded',
     500:'Internal server error',
