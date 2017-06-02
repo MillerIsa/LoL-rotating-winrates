@@ -46,7 +46,10 @@ GAME_MODES = {
     'nexus_seige':GameMode('SIEGE','SIEGE'),
     'definitely_not_dominion':GameMode('ODIN','ODIN_UNRANKED'),
     'snowdown_showdown':GameMode('FIRSTBLOOD','FIRSTBLOOD_1x1'),
-    'arsr':GameMode('ARSR','ARSR')    
+    'arsr':GameMode('ARSR','ARSR'),
+    #null mode should be used when no mode should be examined
+    'null_mode':GameMode('NULL','NULL'),
+    'doom_bots':GameMode('DOOMBOTSTEEMO','NIGHTMARE_BOT')   
     }
 
 MAPS = {
